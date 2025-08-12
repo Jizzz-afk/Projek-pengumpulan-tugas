@@ -53,6 +53,7 @@ Route::middleware(['auth', CekRole::class . ':siswa'])->prefix('siswa')->as('sis
         Route::get('/nilai', [SiswaController::class, 'nilai'])->name('nilai');
         Route::get('/riwayat', [SiswaController::class, 'riwayat'])->name('riwayat');
 
+        Route::get('/kelas', [SiswaController::class, 'kelas'])->name('kelas');
         Route::get('/pengumpulan', [SiswaController::class, 'daftarPengumpulan'])->name('pengumpulan.index');
         Route::get('/pengumpulan/create', [SiswaController::class, 'formPengumpulan'])->name('pengumpulan.create');
         Route::post('/pengumpulan/store', [SiswaController::class, 'simpanPengumpulan'])->name('pengumpulan.store');
