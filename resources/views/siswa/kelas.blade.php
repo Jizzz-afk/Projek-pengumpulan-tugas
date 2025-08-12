@@ -8,27 +8,27 @@
     <div class="row g-4">
         @forelse($kelas as $k)
             <div class="col-md-4">
-                <div class="card shadow-sm border-0 rounded-4 h-100 kelas-card">
-                    <div class="kelas-header text-white p-3 rounded-top" style="background: linear-gradient(135deg, #4f6ef7, #4361ee);">
+                <div class="card kelas-card shadow border-0 rounded-5 h-100 overflow-hidden">
+                    <div class="kelas-header p-4 text-white" style="background: linear-gradient(135deg, #5061f6, #3a49d4); border-bottom-left-radius: 60px;">
                         <div class="d-flex align-items-center">
-                            <div class="me-3 bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
-                                <i class="bi bi-people-fill fs-4"></i>
+                            <div class="icon-circle bg-white bg-opacity-15 me-3 d-flex justify-content-center align-items-center">
+                                <i class="bi bi-people-fill fs-3"></i>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-0">{{ $k->nama_kelas }}</h5>
-                                <small>{{ $k->nama_mapel ?? '-' }}</small>
+                                <h5 class="fw-bold mb-1">{{ $k->nama_kelas }}</h5>
+                                <small class="opacity-75">{{ $k->nama_mapel ?? '-' }}</small>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card-body d-flex flex-column">
-                        <p class="mb-1"><i class="bi bi-person-badge text-primary"></i> <strong>Guru:</strong> {{ $k->guru->nama ?? '-' }}</p>
-                        <p class="mb-1"><i class="bi bi-journal-check text-success"></i> <strong>Tugas Aktif:</strong> {{ $k->tugas->where('status', 'aktif')->count() }}</p>
-                        <p class="mb-3"><i class="bi bi-journal-text text-secondary"></i> <strong>Total Tugas:</strong> {{ $k->tugas->count() }}</p>
+                    <div class="card-body d-flex flex-column bg-gradient-light p-4">
+                        <p class="mb-2"><i class="bi bi-person-badge text-primary me-2"></i><strong>Guru:</strong> {{ $k->guru->nama ?? '-' }}</p>
+                        <p class="mb-2"><i class="bi bi-journal-check text-success me-2"></i><strong>Tugas Aktif:</strong> {{ $k->tugas->where('status', 'aktif')->count() }}</p>
+                        <p class="mb-4"><i class="bi bi-journal-text text-secondary me-2"></i><strong>Total Tugas:</strong> {{ $k->tugas->count() }}</p>
 
                         <div class="mt-auto">
-                            <a href="#" class="btn btn-primary w-100 rounded-pill fw-bold">
-                                Lihat Detail <i class="bi bi-arrow-right-circle ms-1"></i>
+                            <a href="#" class="btn btn-primary w-100 rounded-pill fw-semibold text-uppercase shadow-sm btn-hover-scale">
+                                Lihat Detail <i class="bi bi-arrow-right-circle ms-2 fs-5"></i>
                             </a>
                         </div>
                     </div>
@@ -44,15 +44,32 @@
 
 <style>
 .kelas-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
     cursor: pointer;
+    background: #fff;
+    border-radius: 1.5rem;
 }
 .kelas-card:hover {
-    transform: translateY(-7px);
-    box-shadow: 0 12px 30px rgba(67, 97, 238, 0.3);
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 16px 40px rgba(58, 73, 212, 0.3);
 }
 .kelas-header {
+    border-bottom-left-radius: 60px;
     user-select: none;
+}
+.icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+.bg-gradient-light {
+    background: linear-gradient(135deg, #f9fafe, #e8eefe);
+}
+.btn-hover-scale {
+    transition: transform 0.25s ease;
+}
+.btn-hover-scale:hover {
+    transform: scale(1.05);
 }
 </style>
 @endsection
