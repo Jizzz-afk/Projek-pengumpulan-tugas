@@ -5,74 +5,96 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     @auth
-        @if (Auth::user()->role === 'admin' || Auth::user()->role === 'guru')
-        <style>
-        body {
-            min-height: 100vh;
-        }
-        .sidebar {
-            height: 100vh;
-            width: 250px;
-            position: fixed;
-            background-color: #343a40;
-        }
-        .sidebar a {
-            color: #fff;
-            padding: 15px;
-            display: block;
-            text-decoration: none;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-        .sidebar form :hover {
-            background-color: #495057;
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-        }
-    </style>
-        @endif
-    @endauth
-</head>
-<body>
-    @auth
-    @if (Auth::user()->role === 'admin')
-    <title>Admin Dashboard</title>
-<div class="sidebar">
-    <h4 class="text-white text-center py-4">Admin Panel</h4>
-    <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-    <a href="{{ route('admin.guru.index') }}">Manajemen Guru</a>
-    <a href="{{ route('admin.siswa.index') }}">Manajemen Siswa</a>
-    <a href="{{ route('admin.mapel.index') }}">Mata Pelajaran</a>
-    <a href="{{ route('admin.kelas.index') }}">Kelas</a>
-    <form action="{{ route('logout') }}" method="POST" class="m-0">
-    @csrf
-    <button type="submit" class="w-100 text-start btn btn-link text-white px-3 py-2" style="text-decoration: none;">
-        Logout
-    </button>
-</form>
+@if (Auth::user()->role === 'admin' || Auth::user()->role === 'guru')
+<style>
+    body {
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+    .sidebar {
+        height: 100vh;
+        width: 250px;
+        position: fixed;
+        background: linear-gradient(180deg, #343a40, #212529);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    }
+    .sidebar h4 {
+        font-weight: bold;
+        margin: 0;
+        padding: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar a, .sidebar button {
+        color: #adb5bd;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-size: 15px;
+        transition: all 0.2s ease;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+    }
+    .sidebar a:hover, .sidebar button:hover {
+        background-color: rgba(255,255,255,0.1);
+        color: #fff;
+        border-left: 4px solid #0d6efd;
+        padding-left: 16px;
+    }
+    .sidebar .logout-btn {
+        color: #f8d7da;
+    }
+    .sidebar .logout-btn:hover {
+        background-color: rgba(220,53,69,0.15);
+        border-left: 4px solid #dc3545;
+        color: #fff;
+    }
+    .main-content {
+        margin-left: 250px;
+        padding: 20px;
+    }
+</style>
+@endif
+@endauth
 
+<body>
+@auth
+@if (Auth::user()->role === 'admin')
+<title>Admin Dashboard</title>
+<div class="sidebar">
+    <h4>Admin Panel</h4>
+    <a href="{{ route('admin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="{{ route('admin.guru.index') }}"><i class="bi bi-person-badge"></i> Manajemen Guru</a>
+    <a href="{{ route('admin.siswa.index') }}"><i class="bi bi-people"></i> Manajemen Siswa</a>
+    <a href="{{ route('admin.mapel.index') }}"><i class="bi bi-journal-bookmark"></i> Mata Pelajaran</a>
+    <a href="{{ route('admin.kelas.index') }}"><i class="bi bi-building"></i> Kelas</a>
+    <form action="{{ route('logout') }}" method="POST" class="mt-auto">
+        @csrf
+        <button type="submit" class="logout-btn"><i class="bi bi-box-arrow-right"></i> Logout</button>
+    </form>
 </div>
 @endif
 @endauth
 
 @auth
-    @if (Auth::user()->role === 'guru')
-    <title>Guru Dashboard</title>
+@if (Auth::user()->role === 'guru')
+<title>Guru Dashboard</title>
 <div class="sidebar">
-    <h4 class="text-white text-center py-4">Guru Panel</h4>
-    <a href="{{ route('guru.dashboard') }}">Dashboard</a>
-    <a href="{{ route('guru.tugas') }}">Manajemen Tugas</a>
-    <a href="{{ route('guru.penilaian')}}">Penilaian Tugas</a>
-    <a href="{{ route('guru.profil')}}">Profil</a>
-    <form action="{{ route('logout') }}" method="POST" class="m-0">
-    @csrf
-    <button type="submit" class="w-100 text-start btn btn-link text-white px-3 py-2" style="text-decoration: none;">
-        Logout
-    </button>
-</form>
+    <h4>Guru Panel</h4>
+    <a href="{{ route('guru.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="{{ route('guru.tugas') }}"><i class="bi bi-file-earmark-text"></i> Manajemen Tugas</a>
+    <a href="{{ route('guru.penilaian') }}"><i class="bi bi-check2-square"></i> Penilaian Tugas</a>
+    <a href="{{ route('guru.profil') }}"><i class="bi bi-person-circle"></i> Profil</a>
+    <form action="{{ route('logout') }}" method="POST" class="mt-auto">
+        @csrf
+        <button type="submit" class="logout-btn"><i class="bi bi-box-arrow-right"></i> Logout</button>
+    </form>
 </div>
 @endif
 @endauth
