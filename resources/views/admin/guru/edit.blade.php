@@ -1,29 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-<h3>Edit Guru</h3>
+<div class="container py-4">
+    <h3 class="mb-4 text-primary fw-bold">Edit Guru</h3>
 
-<form action="{{ route('admin.guru.update', $guru->id) }}" method="POST">
-    @csrf
-    @method('PUT')
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    <div>
-        <label>Nama guru</label>
-        <input type="text" name="nama" value="{{ $guru->nama }}" required>
-    </div>
-    <div>
-        <label>Nip</label>
-        <input type="text" name="nip" value="{{ $guru->nip }}" required>
-    </div>
-    <div>
-        <label>Email</label>
-        <input type="text" name="email" value="{{ $guru->email }}" required>
-    </div>
-    <div>
-        <label>Foto</label>
-        <input type="file" name="foto" value="{{ $guru->foto }}">
-    </div>
+    <form action="{{ route('admin.guru.update', $guru->id) }}" method="POST" enctype="multipart/form-data" class="row g-3">
+        @csrf
+        @method('PUT')
 
-    <button type="submit">Simpan</button>
-</form>
+        <div class="col-md-6">
+            <label for="nama" class="form-label">Nama Guru</label>
+            <input type="text" id="nama" name="nama" class="form-control" value="{{ old('nama', $guru->nama) }}" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="nip" class="form-label">NIP</label>
+            <input type="text" id="nip" name="nip" class="form-control" value="{{ old('nip', $guru->nip) }}" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{ old('email', $guru->email) }}" required>
+        </div>
+
+        <div class="col-md-6">
+            <label for="foto" class="form-label">Foto</label>
+            <input type="file" id="foto" name="foto" class="form-control">
+            @if($guru->foto)
+                <small class="text-muted">Foto saat ini:</small><br>
+                <img src="{{ asset('storage/'.$guru->foto) }}" alt="Foto Guru" class="img-thumbnail mt-2" style="max-width: 150px;">
+            @endif
+        </div>
+
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-primary fw-semibold">Simpan Perubahan</button>
+            <a href="{{ url('/admin/guru') }}" class="btn btn-secondary ms-2">Batal</a>
+        </div>
+    </form>
+</div>
 @endsection
