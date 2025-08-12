@@ -94,6 +94,15 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.riwayat', compact('riwayat'));
     }
 
+    public function kelas () {
+        return view ('siswa.kelas');
+    }
+    public function nilai () {
+        return view ('siswa.nilai');
+    }
+    public function riwayat () {
+        return view ('siswa.riwayat');
+    }
     public function profil()
     {
         $user = Auth::user();

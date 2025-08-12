@@ -48,6 +48,9 @@ Route::middleware(['auth', CekRole::class . ':admin' ])->prefix('admin')->group(
 Route::middleware(['auth', CekRole::class . ':siswa'])->prefix('siswa')->as('siswa.')->group(function () {
         Route::get('/dashboard', [SiswaController::class, 'dashboard'])->name('dashboard');
         Route::get('/profil', [SiswaController::class, 'profil'])->name('profil');
+        Route::get('/kelas', [SiswaController::class, 'kelas'])->name('kelas');
+        Route::get('/nilai', [SiswaController::class, 'nilai'])->name('nilai');
+        Route::get('/riwayat', [SiswaController::class, 'riwayat'])->name('riwayat');
 
         Route::get('/kelas', [SiswaController::class, 'kelas'])->name('kelas');
         Route::get('/pengumpulan', [SiswaController::class, 'daftarPengumpulan'])->name('pengumpulan.index');
