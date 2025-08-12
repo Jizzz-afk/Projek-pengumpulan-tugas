@@ -98,6 +98,9 @@
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.nilai') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.nilai') }}">Nilai</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 {{ request()->routeIs('siswa.riwayat') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.riwayat') }}">Riwayat</a>
+                </li>
 
                 <!-- Dropdown Logout -->
                 <li class="nav-item dropdown ms-3">
