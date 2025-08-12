@@ -103,12 +103,19 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.riwayat', compact('riwayat'));
     }
 
-    public function kelas () {
-        return view ('siswa.kelas');
+    public function daftarKelas()
+    {
+        $kelas = auth()->user()->siswa->kelas()
+            ->with(['mapel', 'guru', 'tugas'])
+            ->get();
+
+        return view('siswa.kelas', compact('kelas'));
     }
+
     public function nilai () {
         return view ('siswa.nilai');
     }
+    
     public function riwayat () {
         return view ('siswa.riwayat');
     }
