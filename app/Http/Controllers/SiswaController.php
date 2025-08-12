@@ -104,21 +104,36 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.riwayat', compact('riwayat'));
     }
 
-public function kelas()
-{
-    $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+    public function kelas()
+    {
+        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-    $kelas = Kelas::with(['guru', 'mapel', 'tugas'])->where('id', $siswa->kelas_id)->get();
+        $kelas = Kelas::with(['guru', 'mapel', 'tugas'])->where('id', $siswa->kelas_id)->get();
 
-    return view('siswa.kelas', compact('kelas'));
-}
-
-    public function nilai () {
-        return view ('siswa.nilai');
+        return view('siswa.kelas', compact('kelas'));
     }
-    public function riwayat () {
-        return view ('siswa.riwayat');
+
+    public function nilai()
+    {
+        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+
+        $nilai = Pengumpulan::with('tugas')->where('siswa_id', $siswa->id)->whereNotNull('nilai')->orderBy('created_at', 'desc')->get();
+
+        return view('siswa.nilai', compact('nilai'));
     }
+
+    public function riwayat()
+    {
+        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+
+        $riwayat = Pengumpulan::with('tugas')
+            ->where('siswa_id', $siswa->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('siswa.riwayat', compact('riwayat'));
+    }
+
     public function profil()
     {
         $user = Auth::user();
