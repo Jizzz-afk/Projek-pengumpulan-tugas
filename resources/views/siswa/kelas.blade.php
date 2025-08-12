@@ -15,12 +15,12 @@
                         </div>
                         <div>
                             <h5 class="fw-bold mb-1">{{ $k->nama_kelas }}</h5>
-                            <small class="opacity-75">{{ $k->nama_mapel ?? '-' }}</small>
+                            <small class="opacity-75">{{ $k->nama_mapel ?? 'Bahasa Indonesia' }}</small>
                         </div>
                     </div>
 
                     <div class="card-body d-flex flex-column bg-gradient-light p-4">
-                        <p class="mb-3 fs-6"><i class="bi bi-person-badge text-primary me-2"></i><strong>Guru:</strong> {{ $k->guru->nama ?? '-' }}</p>
+                        <p class="mb-3 fs-6"><i class="bi bi-person-badge text-primary me-2"></i><strong>Guru:</strong> {{ $k->guru->nama ?? 'Doni Prayoga' }}</p>
                         <p class="mb-3 fs-6"><i class="bi bi-journal-check text-success me-2"></i><strong>Tugas Aktif:</strong> {{ $k->tugas->where('status', 'aktif')->count() }}</p>
                         <p class="mb-4 fs-6"><i class="bi bi-journal-text text-secondary me-2"></i><strong>Total Tugas:</strong> {{ $k->tugas->count() }}</p>
 
