@@ -99,15 +99,18 @@
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.kelas') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.kelas') }}">Kelas</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link px-3 {{ request()->routeIs('siswa.pengumpulan.create') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.pengumpulan.create') }}">Tugas</a>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.nilai') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.nilai') }}">Nilai</a>
                 </li>
-<!-- <<<<<<< HEAD
-=======
+
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.riwayat') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.riwayat') }}">Riwayat</a>
                 </li>
->>>>>>> 4af2e1538fc31ba0ae8c4d962b182073ae734a04 -->
 
                 <!-- Dropdown Logout -->
                 <li class="nav-item dropdown ms-3">

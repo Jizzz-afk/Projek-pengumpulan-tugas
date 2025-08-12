@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container py-4">
-    <h2 class="fw-bold text-primary mb-4">📜 Riwayat Pengumpulan</h2>
+    <h2 class="fw-bold text-primary mb-4">📜 Riwayat Tugas</h2>
 
     @if($riwayat->isEmpty())
         <div class="alert alert-info">Belum ada riwayat pengumpulan tugas.</div>

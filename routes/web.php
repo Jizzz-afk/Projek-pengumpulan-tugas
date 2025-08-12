@@ -73,4 +73,5 @@ Route::middleware(['auth', CekRole::class . ':guru'])->prefix('guru')->as('guru.
         Route::post('/penilaian/nilai/{id}', [GuruController::class, 'beriNilai'])->name('penilaian.nilai');
     });
 
+    
 require __DIR__.'/auth.php';

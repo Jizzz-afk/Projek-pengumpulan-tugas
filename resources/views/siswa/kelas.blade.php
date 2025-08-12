@@ -23,7 +23,7 @@
                         <p class="mb-2"><strong>Tugas Aktif:</strong> {{ $k->tugas->where('status', 'aktif')->count() }}</p>
                         <p class="mb-3"><strong>Total Tugas:</strong> {{ $k->tugas->count() }}</p>
                         
-                     
+                            
                             Lihat Detail
                         </a>
                     </div>
