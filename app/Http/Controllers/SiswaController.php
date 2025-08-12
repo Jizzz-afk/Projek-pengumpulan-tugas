@@ -13,13 +13,22 @@ class SiswaController extends Controller
     public function dashboard()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+
+        // Semua tugas sesuai kelas siswa
         $tugas = Tugas::where('kelas_id', $siswa->kelas_id)->get();
+
+        // Tugas yang belum deadline
         $tugasAktif = $tugas->where('deadline', '>=', now())->count();
+
+        // Tugas yang dikumpulkan oleh siswa ini
         $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)->count();
+
+        // Nilai rata-rata dari tugas yang sudah dinilai
         $rataNilai = Pengumpulan::where('siswa_id', $siswa->id)
                         ->whereNotNull('nilai')
                         ->avg('nilai') ?? 0;
 
+        // Tugas terbaru dari kelas siswa (limit 5)
         $tugasBaru = $tugas->sortByDesc('created_at')->take(5);
 
         return view('siswa.dashboard', compact(
@@ -94,19 +103,12 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.riwayat', compact('riwayat'));
     }
 
-    public function daftarKelas()
-    {
-        $kelas = auth()->user()->siswa->kelas()
-            ->with(['mapel', 'guru', 'tugas'])
-            ->get();
-
-        return view('siswa.kelas', compact('kelas'));
+    public function kelas () {
+        return view ('siswa.kelas');
     }
-
     public function nilai () {
         return view ('siswa.nilai');
     }
-    
     public function riwayat () {
         return view ('siswa.riwayat');
     }
