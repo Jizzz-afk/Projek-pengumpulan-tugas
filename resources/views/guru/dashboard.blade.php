@@ -4,7 +4,6 @@
 <div class="container">
     <h3>Dashboard Guru</h3>
 
-    {{-- Tampilkan jika guru adalah wali kelas --}}
     @if ($kelasYangDibina->count() > 0)
         <div class="alert alert-info">
             Anda adalah wali kelas dari:

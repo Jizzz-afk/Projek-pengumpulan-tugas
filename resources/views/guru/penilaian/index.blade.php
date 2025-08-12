@@ -15,7 +15,7 @@
                 <th>Judul Tugas</th>
                 <th>File</th>
                 <th>Nilai</th>
-                <th>Aksi</th>
+                <th>Input Nilai</th>
             </tr>
         </thead>
         <tbody>

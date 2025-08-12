@@ -48,16 +48,18 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.index', compact('pengumpulan'));
     }
 
-    public function formPengumpulan()
-    {
-        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+        public function formPengumpulan()
+        {
+            $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-        $tugas = Tugas::where('kelas_id', $siswa->kelas_id)->get();
+            $tugas = Tugas::where('kelas_id', $siswa->kelas_id)->get();
 
-        return view('siswa.pengumpulan.create', compact('tugas'));
-    }
+            $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)->pluck('tugas_id')->toArray();
 
-    public function simpanPengumpulan(Request $request)
+            return view('siswa.pengumpulan.create', compact('tugas', 'tugasTerkumpul'));
+        }
+
+        public function simpanPengumpulan(Request $request)
     {
         $request->validate([
             'tugas_id' => 'required|exists:tugas,id',
@@ -65,6 +67,18 @@ class SiswaController extends Controller
         ]);
 
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+
+        $tugas = Tugas::findOrFail($request->tugas_id);
+
+        $sudahMengumpulkan = Pengumpulan::where('tugas_id', $tugas->id)->where('siswa_id', $siswa->id)->exists();
+
+        if ($sudahMengumpulkan) {
+            return back()->with('error', 'Anda sudah mengumpulkan tugas ini.');
+        }
+
+        if (now()->gt($tugas->deadline)) {
+            return back()->with('error', 'Deadline tugas telah lewat. Anda tidak dapat mengumpulkan tugas ini.');
+        }
 
         $path = $request->file('file')->store('pengumpulan', 'public');
 

@@ -33,6 +33,13 @@ class DashboardController extends Controller
 
     public function guruStore(Request $r)
     {
+        $r->validate([
+            'nama' => 'required|string|max:255',
+            'nip' => 'required|string|max:50|unique:guru,nip',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6'
+        ]);
+
         $user = User::create([
             'name' => $r->nama,
             'email' => $r->email,
@@ -68,6 +75,12 @@ class DashboardController extends Controller
 public function guruUpdate(Request $r, $id)
     {
         $guru = Guru::findOrFail($id);
+        $r->validate([
+            'nama' => 'required|string|max:255',
+            'nip' => 'required|string|max:50|unique:guru,nip,' . $id,
+            'email' => 'required|email|unique:users,email,' . $guru->user_id,
+        ]);
+
         $guru->update([
             'nama' => $r->nama,
             'nip' => $r->nip,
@@ -94,8 +107,19 @@ public function guruUpdate(Request $r, $id)
 
     public function siswaStore(Request $r)
     {
-        $path = null;
+        $r->validate([
+            'nama' => 'required|string|max:255',
+            'nis' => 'required|string|max:50|unique:siswa,nis',
+            'email' => 'required|email|unique:users,email', // 🔹 ini yang mencegah duplikat di tabel users
+            'kelas_id' => 'required|exists:kelas,id',
+            'password' => 'required|min:6',
+            'foto' => 'nullable|image|max:2048'
+        ], [
+            'nis.unique' => 'NIS ini sudah terdaftar.',
+            'email.unique' => 'Email ini sudah digunakan.',
+        ]);
 
+        $path = null;
         if ($r->hasFile('foto')) {
             $filename = $r->file('foto')->getClientOriginalName();
             $r->file('foto')->storeAs('public/foto', $filename);
@@ -115,12 +139,11 @@ public function guruUpdate(Request $r, $id)
             'nis' => $r->nis,
             'kelas_id' => $r->kelas_id,
             'email' => $r->email,
-            'foto' => $path ?? '' 
+            'foto' => $path ?? ''
         ]);
 
         return back()->with('success', 'Siswa ditambahkan');
     }
-
 
         public function siswaDelete($id)
         {
@@ -177,10 +200,21 @@ public function guruUpdate(Request $r, $id)
 
     public function kelasStore(Request $r)
     {
+        $r->validate([
+            'nama_kelas' => 'required|unique:kelas,nama_kelas',
+            'guru_id' => 'required|exists:guru,id',
+        ], [
+            'nama_kelas.unique' => 'Kelas dengan nama ini sudah ada.',
+            'nama_kelas.required' => 'Nama kelas wajib diisi.',
+            'guru_id.required' => 'Pilih guru untuk kelas ini.',
+            'guru_id.exists' => 'Guru tidak ditemukan.',
+        ]);
+
         Kelas::create([
-        'nama_kelas' => $r->nama_kelas,
-        'guru_id' => $r->guru_id
-    ]);
+            'nama_kelas' => $r->nama_kelas,
+            'guru_id' => $r->guru_id
+        ]);
+
         return back()->with('success', 'Kelas ditambahkan');
     }
 
@@ -222,6 +256,10 @@ public function guruUpdate(Request $r, $id)
 
     public function mapelStore(Request $r)
     {
+        $r->validate([
+            'nama_mapel' => 'required|unique:mapel,nama_mapel',
+            'guru_id' => 'required|exists:guru,id',
+        ]);
         Mapel::create([
             'nama_mapel' => $r->nama_mapel,
             'guru_id' => $r->guru_id
@@ -245,6 +283,11 @@ public function guruUpdate(Request $r, $id)
 
     public function mapelUpdate(Request $r, $id)
     {
+        $r->validate([
+            'nama_mapel' => 'required|unique:mapel,nama_mapel,' . $id,
+            'guru_id' => 'required|exists:guru,id',
+        ]);
+
         $mapel = Mapel::findOrFail($id);
         $mapel->update([
             'nama_mapel' => $r->nama_mapel,

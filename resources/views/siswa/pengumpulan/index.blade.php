@@ -22,7 +22,7 @@
             @foreach($pengumpulan as $item)
             <tr>
                 <td>{{ $item->tugas->judul }}</td>
-                <td><a href="{{ asset('storage/' . $item->file_tugas) }}" target="_blank">Lihat</a></td>
+                <td><a href="{{ asset('storage/' . $item->file) }}" target="_blank">Lihat</a></td>
                 <td>{{ $item->created_at->format('d M Y H:i') }}</td>
             </tr>
             @endforeach

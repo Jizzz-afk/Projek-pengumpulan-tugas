@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
+    @auth
+        @if (Auth::user()->role === 'admin' || Auth::user()->role === 'guru')
+        <style>
         body {
             min-height: 100vh;
         }
@@ -30,9 +32,11 @@
             padding: 20px;
         }
     </style>
+        @endif
+    @endauth
 </head>
 <body>
-@auth
+    @auth
     @if (Auth::user()->role === 'admin')
     <title>Admin Dashboard</title>
 <div class="sidebar">
@@ -97,9 +101,6 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.pengumpulan.riwayat') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.pengumpulan.riwayat') }}">Riwayat</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link px-3 {{ request()->routeIs('siswa.profil') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.profil') }}">Profil</a>
                 </li>
 
                 <!-- Dropdown Logout -->

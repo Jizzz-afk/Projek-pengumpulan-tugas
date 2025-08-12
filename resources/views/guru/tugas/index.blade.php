@@ -4,7 +4,7 @@
 
 <div class="container">
 
-    <a href="{{ route('guru.tugas.buat') }}">Buat Tugas Baru</a>
+    <a href="{{ route('guru.tugas.buat') }}" class="btn btn-primary mb-3">Buat Tugas Baru</a>
     
 <table class="table table-bordered">
     <tr>

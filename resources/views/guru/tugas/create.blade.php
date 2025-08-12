@@ -1,6 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $e)
+                <li>{{ $e }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="container">
     <h4>Buat Tugas Baru</h4>
 
@@ -27,7 +38,9 @@
         </div>
 
         <div class="mb-3">
-            <select name="kelas_id" class="form-control">
+            <label for="kelas_id" class="form-label">Kelas</label>
+            <select name="kelas_id" class="form-control" class="form-control" required>
+                <option value="">-- Pilih Kelas --</option>
             @foreach($kelas as $k)
                 <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
             @endforeach
