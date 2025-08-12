@@ -104,6 +104,11 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.riwayat', compact('riwayat'));
     }
 
+    public function detail()
+    {
+        return view('siswa.detail');
+    }
+
     public function kelas()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
