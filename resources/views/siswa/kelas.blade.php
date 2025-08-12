@@ -16,14 +16,14 @@
                             </div>
                             <div>
                                 <h5 class="fw-bold mb-0">{{ $k->nama_kelas }}</h5>
-                                <small class="text-muted">{{ $k->mapel->nama_mapel ?? '-' }}</small>
+                                <small class="text-muted">{{ $k->nama_mapel ?? '' }}</small>
                             </div>
                         </div>
                         <p class="mb-2"><strong>Guru:</strong> {{ $k->guru->nama ?? '-' }}</p>
                         <p class="mb-2"><strong>Tugas Aktif:</strong> {{ $k->tugas->where('status', 'aktif')->count() }}</p>
                         <p class="mb-3"><strong>Total Tugas:</strong> {{ $k->tugas->count() }}</p>
                         
-                        <a href="{{ route('kelas.detail', $k->id) }}" class="btn btn-primary w-100">
+                     
                             Lihat Detail
                         </a>
                     </div>

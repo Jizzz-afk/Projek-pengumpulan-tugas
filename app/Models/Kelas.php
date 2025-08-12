@@ -24,6 +24,10 @@ class Kelas extends Model
         return $this->hasMany(Jadwal::class);
     }
 
+    public function mapel()
+    {
+        return $this->hasMany(Tugas::class);
+    }
     public function tugas()
     {
         return $this->hasMany(Tugas::class);

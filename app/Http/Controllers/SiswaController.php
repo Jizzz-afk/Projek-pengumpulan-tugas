@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Siswa;
 use App\Models\Tugas;
+use App\Models\Kelas;
 use App\Models\Pengumpulan;
 use Illuminate\Http\Request;
 
@@ -103,9 +104,15 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.riwayat', compact('riwayat'));
     }
 
-    public function kelas () {
-        return view ('siswa.kelas');
-    }
+public function kelas()
+{
+    $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+
+    $kelas = Kelas::with(['guru', 'mapel', 'tugas'])->where('id', $siswa->kelas_id)->get();
+
+    return view('siswa.kelas', compact('kelas'));
+}
+
     public function nilai () {
         return view ('siswa.nilai');
     }
