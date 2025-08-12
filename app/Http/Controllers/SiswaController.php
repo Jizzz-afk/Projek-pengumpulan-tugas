@@ -104,9 +104,10 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.riwayat', compact('riwayat'));
     }
 
-    public function detail()
+    public function detail($id)
     {
-        return view('siswa.detail');
+        $kelas = Kelas::with(['guru', 'tugas'])->findOrFail($id);
+        return view('siswa.detail', compact('kelas'));
     }
 
     public function kelas()
