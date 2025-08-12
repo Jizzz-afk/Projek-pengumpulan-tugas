@@ -3,7 +3,6 @@
 @section('content')
 
 @if ($userRole === 'admin')
-    <p>Selamat datang Admin!</p>
 @endif
 
 <div class="container">

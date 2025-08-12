@@ -110,7 +110,7 @@ public function guruUpdate(Request $r, $id)
         $r->validate([
             'nama' => 'required|string|max:255',
             'nis' => 'required|string|max:50|unique:siswa,nis',
-            'email' => 'required|email|unique:users,email', // 🔹 ini yang mencegah duplikat di tabel users
+            'email' => 'required|email|unique:users,email', 
             'kelas_id' => 'required|exists:kelas,id',
             'password' => 'required|min:6',
             'foto' => 'nullable|image|max:2048'
