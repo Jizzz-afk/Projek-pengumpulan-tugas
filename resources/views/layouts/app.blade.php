@@ -102,14 +102,6 @@
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.nilai') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.nilai') }}">Nilai</a>
                 </li>
-<!-- <<<<<<< HEAD
-=======
-                <li class="nav-item">
-                    <a class="nav-link px-3 {{ request()->routeIs('siswa.riwayat') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.riwayat') }}">Riwayat</a>
-                </li>
->>>>>>> 4af2e1538fc31ba0ae8c4d962b182073ae734a04 -->
-
-                <!-- Dropdown Logout -->
                 <li class="nav-item dropdown ms-3">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="avatar" width="32" height="32" class="rounded-circle me-1">
