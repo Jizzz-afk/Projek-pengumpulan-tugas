@@ -8,7 +8,7 @@
             
             {{-- Foto Guru --}}
             <div class="me-4 flex-shrink-0">
-                <img src="{{ $guru->foto ? asset('storage/' . $guru->foto) : asset('images/default.png') }}"
+                <img src="{{ $guru->foto ? asset('storage/' . $guru->foto) : asset('foto/default.png') }}"
                      alt="Foto Guru"
                      class="rounded-circle border border-3 shadow-sm"
                      width="100" height="100"
