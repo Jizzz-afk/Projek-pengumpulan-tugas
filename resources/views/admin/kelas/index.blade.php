@@ -41,6 +41,7 @@
             <thead class="table-primary">
                 <tr>
                     <th>Nama Kelas</th>
+                    <th>Deskripsi</th>
                     <th>Wali Kelas</th>
                     <th class="text-center" style="width: 150px;">Aksi</th>
                 </tr>
