@@ -126,7 +126,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link px-3 {{ request()->routeIs('siswa.pengumpulan.create') ? 'active-link' : '' }}" href="{{ route('siswa.pengumpulan.create') }}">
+                    <a class="nav-link px-3 {{ request()->routeIs('siswa.pengumpulan.index') ? 'active-link' : '' }}" href="{{ route('siswa.pengumpulan.index') }}">
                         <i class="bi bi-journal-text me-1"></i> Tugas
                     </a>
                 </li>
