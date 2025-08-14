@@ -39,6 +39,8 @@ class UserSeeder extends Seeder
         $kelas = Kelas::create([
             'nama_kelas' => 'XII DPIB 1',
             'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 1',
+             'nama_kelas' => 'XII DPIB 2',
+            'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 2',
         ]);
 
         // // Siswa
