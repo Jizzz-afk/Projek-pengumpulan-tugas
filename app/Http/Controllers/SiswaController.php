@@ -49,48 +49,58 @@ class SiswaController extends Controller
         return view('siswa.pengumpulan.index', compact('pengumpulan'));
     }
 
-        public function formPengumpulan()
-        {
-            $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+public function formPengumpulan()
+{
+    $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-            $tugas = Tugas::where('kelas_id', $siswa->kelas_id)->get();
+    $tugas = Tugas::where('kelas_id', $siswa->kelas_id)
+                ->orderBy('deadline', 'asc')
+                ->get();
 
-            $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)->pluck('tugas_id')->toArray();
+    $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)
+                                ->pluck('tugas_id')
+                                ->toArray();
 
-            return view('siswa.pengumpulan.create', compact('tugas', 'tugasTerkumpul'));
-        }
+    return view('siswa.pengumpulan.create', compact('tugas', 'tugasTerkumpul'));
+}
 
-        public function simpanPengumpulan(Request $request)
-    {
-        $request->validate([
-            'tugas_id' => 'required|exists:tugas,id',
-            'file' => 'required|file|max:2048',
-        ]);
 
-        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+public function simpanPengumpulan(Request $request)
+{
+    $request->validate([
+        'tugas_id' => 'required|exists:tugas,id',
+        'file' => 'required|file|mimes:pdf,docx,zip,rar,jpg,png|max:2048',
+    ]);
 
-        $tugas = Tugas::findOrFail($request->tugas_id);
+    $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-        $sudahMengumpulkan = Pengumpulan::where('tugas_id', $tugas->id)->where('siswa_id', $siswa->id)->exists();
+    $tugas = Tugas::findOrFail($request->tugas_id);
 
-        if ($sudahMengumpulkan) {
-            return back()->with('error', 'Anda sudah mengumpulkan tugas ini.');
-        }
+    // Cek apakah sudah mengumpulkan
+    $sudahMengumpulkan = Pengumpulan::where('tugas_id', $tugas->id)
+                                    ->where('siswa_id', $siswa->id)
+                                    ->exists();
 
-        if (now()->gt($tugas->deadline)) {
-            return back()->with('error', 'Deadline tugas telah lewat. Anda tidak dapat mengumpulkan tugas ini.');
-        }
-
-        $path = $request->file('file')->store('pengumpulan', 'public');
-
-        Pengumpulan::create([
-            'tugas_id' => $request->tugas_id,
-            'siswa_id' => $siswa->id,
-            'file' => $path,
-        ]);
-
-        return redirect()->route('siswa.pengumpulan.index')->with('success', 'Tugas berhasil dikumpulkan!');
+    if ($sudahMengumpulkan) {
+        return back()->with('error', 'Anda sudah mengumpulkan tugas ini.');
     }
+
+    // Cek deadline
+    if (now()->gt($tugas->deadline)) {
+        return back()->with('error', 'Deadline tugas telah lewat. Anda tidak dapat mengumpulkan tugas ini.');
+    }
+
+    $path = $request->file('file')->store('pengumpulan', 'public');
+
+    Pengumpulan::create([
+        'tugas_id' => $request->tugas_id,
+        'siswa_id' => $siswa->id,
+        'file' => $path,
+    ]);
+
+    return redirect()->route('siswa.pengumpulan.index')->with('success', 'Tugas berhasil dikumpulkan!');
+}
+
 
     public function riwayatNilai()
     {
