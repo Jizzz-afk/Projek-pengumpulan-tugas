@@ -50,6 +50,7 @@
                 @forelse($kelas as $k)
                 <tr>
                     <td>{{ $k->nama_kelas }}</td>
+                    <td>{{ $k->deskripsi }}</td>
                     <td>{{ $k->guru->nama ?? '-' }}</td>
                     <td class="text-center">
                         <a href="{{ url('/admin/kelas/'.$k->id.'/edit') }}" class="btn btn-sm btn-warning me-1" title="Edit Kelas">
