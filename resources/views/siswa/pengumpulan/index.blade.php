@@ -5,14 +5,16 @@
 
     <!-- Judul Halaman -->
     <div class="mb-4 text-center">
-        <h3 class="fw-bold mb-1 text-gradient">📚 Daftar Tugas Kelas Saya</h3>
-        <p class="text-muted">Berikut adalah semua tugas yang harus kamu kerjakan sesuai kelasmu.</p>
+        <h3 class="fw-bold mb-1 text-gradient">
+            📚 Daftar Tugas Kelas Saya
+        </h3>
+        <p class="text-muted">Semua tugas yang harus kamu kerjakan sesuai kelasmu.</p>
     </div>
 
     <!-- Alert sukses -->
     @if(session('success'))
         <div class="alert alert-success shadow-sm rounded-pill px-4">
-            {{ session('success') }}
+            ✅ {{ session('success') }}
         </div>
     @endif
 
@@ -20,8 +22,8 @@
     <div class="card task-card shadow border-0 rounded-4 overflow-hidden">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-header text-white">
+                <table class="table table-modern align-middle mb-0">
+                    <thead class="table-header sticky-top">
                         <tr>
                             <th>Judul Tugas</th>
                             <th>Deskripsi</th>
@@ -37,24 +39,29 @@
                                     ->where('siswa_id', auth()->user()->siswa->id)
                                     ->exists();
                             @endphp
-                            <tr>
-                                <td class="fw-semibold">{{ $t->judul }}</td>
-                                <td>{{ $t->deskripsi ?? '-' }}</td>
+                            <tr class="{{ $sudahKumpul ? 'row-selesai' : 'row-belum' }}">
+                                <td class="fw-semibold text-dark">{{ $t->judul }}</td>
+                                <td class="text-muted small text-truncate-2">{{ $t->deskripsi ?? '-' }}</td>
                                 <td>
                                     <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm">
-                                        {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}
+                                        ⏰ {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}
                                     </span>
                                 </td>
                                 <td>
                                     @if($sudahKumpul)
-                                        <span class="badge bg-success px-3 py-2 rounded-pill shadow-sm">Sudah Dikumpulkan</span>
+                                        <span class="badge bg-success px-3 py-2 rounded-pill shadow-sm">
+                                            ✅ Sudah Dikumpulkan
+                                        </span>
                                     @else
-                                        <span class="badge bg-danger px-3 py-2 rounded-pill shadow-sm">Belum Dikumpulkan</span>
+                                        <span class="badge bg-danger px-3 py-2 rounded-pill shadow-sm">
+                                            ⏳ Belum Dikumpulkan
+                                        </span>
                                     @endif
                                 </td>
                                 <td class="text-center">
                                     @if(!$sudahKumpul && now() <= $t->deadline)
-                                        <a href="{{ route('siswa.pengumpulan.create', ['tugas_id' => $t->id]) }}" class="btn btn-sm btn-success shadow-sm rounded-pill px-3 btn-hover-scale">
+                                        <a href="{{ route('siswa.pengumpulan.create', ['tugas_id' => $t->id]) }}"
+                                           class="btn btn-sm btn-success shadow-sm rounded-pill px-3 btn-hover-scale">
                                             📤 Kumpulkan
                                         </a>
                                     @else
@@ -68,11 +75,19 @@
                             <tr>
                                 <td colspan="5" class="text-center py-5 bg-light">
                                     <div class="d-flex flex-column align-items-center">
-                                        <!-- Ikon animasi -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" fill="currentColor" class="text-secondary mb-3 animate-book" viewBox="0 0 16 16">
-                                            <path d="M1 2.828c.885-.37 2.154-.654 3.5-.654 1.346 0 2.615.284 3.5.654V13.5c-.885-.37-2.154-.654-3.5-.654-1.346 0-2.615.284-3.5.654V2.828z"/>
-                                            <path d="M0 1.5A.5.5 0 0 1 .5 1h5a.5.5 0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 0 14.5v-13zM6 2H1v11h5V2z"/>
-                                            <path d="M15 1.5A.5.5 0 0 1 15.5 1h-5a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 .5-.5v-13zM10 2h5v11h-5V2z"/>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" fill="currentColor"
+                                             class="text-secondary mb-3 animate-book" viewBox="0 0 16 16">
+                                            <path d="M1 2.828c.885-.37 2.154-.654 3.5-.654 
+                                                     1.346 0 2.615.284 3.5.654V13.5
+                                                     c-.885-.37-2.154-.654-3.5-.654
+                                                     -1.346 0-2.615.284-3.5.654V2.828z"/>
+                                            <path d="M0 1.5A.5.5 0 0 1 .5 1h5a.5.5 
+                                                     0 0 1 .5.5v13a.5.5 0 0 1-.5.5h-5
+                                                     A.5.5 0 0 1 0 14.5v-13zM6 2H1v11h5V2z"/>
+                                            <path d="M15 1.5A.5.5 0 0 1 15.5 1h-5
+                                                     a.5.5 0 0 0-.5.5v13a.5.5 
+                                                     0 0 0 .5.5h5a.5.5 0 0 0 
+                                                     .5-.5v-13zM10 2h5v11h-5V2z"/>
                                         </svg>
                                         <h5 class="text-muted fw-bold">Belum ada tugas untuk kelas kamu</h5>
                                         <p class="text-muted small mb-0">Nikmati waktu luangmu... tapi tetap siap kalau ada tugas baru! 😉</p>
@@ -87,23 +102,98 @@
     </div>
 </div>
 
-{{-- CSS sama seperti yang kamu tulis sebelumnya --}}
+{{-- CSS --}}
 <style>
     .text-gradient {
         background: linear-gradient(90deg, #007bff, #00c4ff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-    .task-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .task-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-    .table-header { background: linear-gradient(90deg, #0d6efd, #0dcaf0); }
-    .table-hover tbody tr:hover { background-color: rgba(13, 110, 253, 0.06); transition: background-color 0.2s ease-in-out; }
-    .animate-book { animation: floating 3s ease-in-out infinite; }
-    @keyframes floating { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
-    .fade-in { animation: fadeInUp 0.5s ease-in-out; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .btn-hover-scale { transition: transform 0.2s ease; }
-    .btn-hover-scale:hover { transform: scale(1.05); }
-    .badge { font-size: 0.85rem; }
+    .task-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .task-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    /* Table Styling */
+    .table-modern {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table-modern th, .table-modern td {
+        padding: 1rem 1.2rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .table-modern tbody tr {
+        transition: background-color 0.2s ease-in-out, transform 0.15s ease;
+    }
+    .table-modern tbody tr:hover {
+        transform: scale(1.002);
+        box-shadow: inset 0 0 0 9999px rgba(13, 110, 253, 0.04);
+    }
+
+    /* Header */
+    .table-header {
+        background: linear-gradient(90deg, #0d6efd, #0dcaf0);
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .table-header th {
+        border: none;
+    }
+    .sticky-top {
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Row coloring based on status */
+    .row-selesai {
+        background-color: rgba(25, 135, 84, 0.08);
+    }
+    .row-belum {
+        background-color: rgba(220, 53, 69, 0.08);
+    }
+    .row-selesai:hover {
+        background-color: rgba(25, 135, 84, 0.15) !important;
+    }
+    .row-belum:hover {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+    }
+
+    /* Truncate text to 2 lines */
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .animate-book {
+        animation: floating 3s ease-in-out infinite;
+    }
+    @keyframes floating {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+    }
+    .fade-in {
+        animation: fadeInUp 0.5s ease-in-out;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .btn-hover-scale {
+        transition: transform 0.2s ease;
+    }
+    .btn-hover-scale:hover {
+        transform: scale(1.05);
+    }
+    .badge {
+        font-size: 0.85rem;
+    }
 </style>
 @endsection
