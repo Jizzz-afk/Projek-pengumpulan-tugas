@@ -119,18 +119,10 @@
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.dashboard') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.dashboard') }}">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link px-3 {{ request()->routeIs('siswa.kelas') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.kelas') }}">Kelas</a>
-                </li>
-
+                
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.pengumpulan.create') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.pengumpulan.create') }}">Tugas</a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link px-3 {{ request()->routeIs('siswa.nilai') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.nilai') }}">Nilai</a>
-                </li>
-
 
                 <li class="nav-item">
                     <a class="nav-link px-3 {{ request()->routeIs('siswa.riwayat') ? 'text-primary fw-semibold' : '' }}" href="{{ route('siswa.riwayat') }}">Riwayat</a>
