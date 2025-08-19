@@ -37,10 +37,98 @@ class UserSeeder extends Seeder
 
         // Kelas
         $kelas = Kelas::create([
-            'nama_kelas' => 'XII DPIB 1',
-            'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 1',
-             'nama_kelas' => 'XII DPIB 2',
-            'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 2',
+            [
+                'nama_kelas' => 'XII DPIB 1',
+                'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 1',
+            ],
+            [
+                'nama_kelas' => 'XII DPIB 2',
+               'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 2',
+            ],
+            [
+                'nama_kelas' => 'XII DPIB 3',
+               'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 3',
+            ],
+            [
+             'nama_kelas' => 'XII DPIB 4',
+            'deskripsi' => 'Kelas 12 Desain Pemodelan dan Informasi Bangunan 4',
+            ],
+            [
+             'nama_kelas' => 'XII TEI 1',
+            'deskripsi' => 'Kelas 12 Teknik Elektronika Inndustri 1',
+            ],
+            [
+             'nama_kelas' => 'XII TEI 2',
+            'deskripsi' => 'Kelas 12 Teknik Elektronika Inndustri 2',
+            ],
+            [
+             'nama_kelas' => 'XII TEI 3',
+            'deskripsi' => 'Kelas 12 Teknik Elektronika Inndustri 3',
+            ],
+            [
+             'nama_kelas' => 'XII TOI',
+            'deskripsi' => 'Kelas 12 Teknik Otomasi Industri',
+            ],
+            [
+             'nama_kelas' => 'XII TKJ 1',
+            'deskripsi' => 'Kelas 12 Teknik Komputer dan Jaringan 1',
+            ],
+            [
+             'nama_kelas' => 'XII TKJ 2',
+            'deskripsi' => 'Kelas 12 Teknik Komputer dan Jaringan 2',
+            ],
+            [
+             'nama_kelas' => 'XII RPL 1',
+            'deskripsi' => 'Kelas 12 Rekayasa Perangkat Lunak 1',
+            ],
+            [
+             'nama_kelas' => 'XII RPL 2',
+            'deskripsi' => 'Kelas 12 Rekayasa Perangkat Lunak 2',
+            ],
+            [
+            'nama_kelas' => 'XII TITL 1',
+            'deskripsi' => 'Kelas 12 Teknik Instalasi Tenaga Listrik 1',
+            ],
+            [
+            'nama_kelas' => 'XII TITL 2',
+            'deskripsi' => 'Kelas 12 Teknik Instalasi Tenaga Listrik 2',
+            ],
+            [
+            'nama_kelas' => 'XII TITL 3',
+            'deskripsi' => 'Kelas 12 Teknik Instalasi Tenaga Listrik 3',
+            ],
+            [
+            'nama_kelas' => 'XII TPTUP',
+            'deskripsi' => 'Kelas 12 Teknik Pengelasan dan Teknik Usaha Produksi',
+            ],
+            [
+            'nama_kelas' => 'XII TPM 1',
+            'deskripsi' => 'Kelas 12 Teknik Pemesinan 1',
+            ],
+            [
+            'nama_kelas' => 'XII TPM 2',
+            'deskripsi' => 'Kelas 12 Teknik Pemesinan 2',
+            ],
+            [
+            'nama_kelas' => 'XII TPM 3',
+            'deskripsi' => 'Kelas 12 Teknik Pemesinan 3',
+            ],
+            [
+            'nama_kelas' => 'XII TKR 1',
+            'deskripsi' => 'Kelas 12 Teknik Kendaraan Ringan 1',
+            ],
+            [
+            'nama_kelas' => 'XII TKR 2',
+            'deskripsi' => 'Kelas 12 Teknik Kendaraan Ringan 2',
+            ],
+            [
+            'nama_kelas' => 'XII TKR 3',
+            'deskripsi' => 'Kelas 12 Teknik Kendaraan Ringan 3',
+            ],
+            [
+            'nama_kelas' => 'XII TBKR',
+            'deskripsi' => 'Kelas 12 Teknik Bodi Kendaraan Ringan',
+            ],
         ]);
 
         // // Siswa
