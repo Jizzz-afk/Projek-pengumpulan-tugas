@@ -54,9 +54,10 @@ Route::middleware(['auth', CekRole::class . ':siswa'])->prefix('siswa')->as('sis
         Route::get('/detail/{id}', [SiswaController::class, 'detail'])->name('detail');
 
         Route::get('/pengumpulan', [SiswaController::class, 'daftarPengumpulan'])->name('pengumpulan.index');
-        Route::get('/pengumpulan/create', [SiswaController::class, 'formPengumpulan'])->name('pengumpulan.create');
+        Route::get('/pengumpulan/create/{tugas_id}', [SiswaController::class, 'formPengumpulan'])->name('pengumpulan.create');
         Route::post('/pengumpulan/store', [SiswaController::class, 'simpanPengumpulan'])->name('pengumpulan.store');
         Route::get('/pengumpulan/riwayat', [SiswaController::class, 'riwayatNilai'])->name('pengumpulan.riwayat');
+        Route::post('/pengumpulan/simpan', [SiswaController::class, 'simpanPengumpulan'])->name('pengumpulan.simpan');
     });
 
 Route::middleware(['auth', CekRole::class . ':guru'])->prefix('guru')->as('guru.')->group(function () {

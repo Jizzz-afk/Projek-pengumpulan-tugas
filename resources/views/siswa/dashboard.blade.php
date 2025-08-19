@@ -129,8 +129,20 @@
                                 $isToday = $date->isToday();
                                 $hasTask = isset($tasksByDate[$key]);
                                 $taskCount = $hasTask ? $tasksByDate[$key]->count() : 0;
+
+                                // Cek semua tugas pada hari itu sudah dikumpulkan atau belum
+                                $allDone = false;
+                                if ($hasTask) {
+                                    $allDone = $tasksByDate[$key]->every(function($t) {
+                                        return $t->pengumpulan()
+                                            ->where('siswa_id', Auth::user()->siswa->id)
+                                            ->exists();
+                                    });
+                                }
                             @endphp
-                            <div class="calendar-cell {{ $isToday ? 'calendar-today' : '' }} {{ $hasTask ? 'calendar-hastask' : '' }}">
+                            <div class="calendar-cell 
+                                {{ $isToday ? 'calendar-today' : '' }} 
+                                {{ $hasTask ? ($allDone ? 'calendar-taskdone' : 'calendar-hastask') : '' }}">
                                 <div class="calendar-daynum">{{ $day }}</div>
                                 @if($hasTask)
                                     <span class="calendar-dot" title="{{ $taskCount }} tugas pada {{ $date->translatedFormat('l, d M Y') }}"></span>
@@ -158,7 +170,11 @@
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="legend-dot"></span>
-                            <span class="tiny text-muted">Ada tugas</span>
+                            <span class="tiny text-muted">Ada tugas (belum semua selesai)</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="legend-dot done"></span>
+                            <span class="tiny text-muted">Semua tugas selesai</span>
                         </div>
                     </div>
                 </div>
@@ -194,7 +210,9 @@
     .calendar-cell:hover { box-shadow: 0 6px 14px rgba(13,110,253,.08); transform: translateY(-1px); }
     .calendar-today { box-shadow: inset 0 0 0 2px #0d6efd33; background: #f2f7ff; }
     .calendar-hastask { border-color:#ffe08a; background:#fffdf5; }
+    .calendar-taskdone { border-color: #b2f2bb; background:#f6fffa; }
     .calendar-dot { position:absolute; right:8px; bottom:8px; width:8px; height:8px; border-radius:50%; background:#ffc107; }
+    .calendar-taskdone .calendar-dot { background:#28a745; }
     .calendar-popover { position:absolute; display:none; z-index:5; left:50%; bottom: calc(100% + 8px); transform: translateX(-50%); width: 260px; padding: .6rem .75rem; border-radius: 12px; background:#fff; border:1px solid #eef1f5; box-shadow: 0 12px 26px rgba(0,0,0,.12); }
     .calendar-cell:hover .calendar-popover { display:block; }
     .fade-in { animation: fadeIn .15s ease-in; }
@@ -202,6 +220,7 @@
 
     .legend-circle { width:14px; height:14px; border-radius:50%; box-shadow: inset 0 0 0 2px #0d6efd; background:#eaf2ff; display:inline-block; }
     .legend-dot { width:10px; height:10px; border-radius:50%; background:#ffc107; border:1px solid #ffd45b; display:inline-block; }
+    .legend-dot.done { background:#28a745; border-color:#28a745; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

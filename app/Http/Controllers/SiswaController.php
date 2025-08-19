@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 
 class SiswaController extends Controller
 {
+    /**
+     * Dashboard siswa
+     */
     public function dashboard()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
@@ -18,18 +21,18 @@ class SiswaController extends Controller
         // Semua tugas sesuai kelas siswa
         $tugas = Tugas::where('kelas_id', $siswa->kelas_id)->get();
 
-        // Tugas yang belum deadline
+        // Hitung jumlah tugas aktif (belum lewat deadline)
         $tugasAktif = $tugas->where('deadline', '>=', now())->count();
 
-        // Tugas yang dikumpulkan oleh siswa ini
+        // Hitung tugas yang sudah dikumpulkan
         $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)->count();
 
-        // Nilai rata-rata dari tugas yang sudah dinilai
+        // Hitung rata-rata nilai
         $rataNilai = Pengumpulan::where('siswa_id', $siswa->id)
-                        ->whereNotNull('nilai')
-                        ->avg('nilai') ?? 0;
+            ->whereNotNull('nilai')
+            ->avg('nilai') ?? 0;
 
-        // Tugas terbaru dari kelas siswa (limit 5)
+        // Ambil 5 tugas terbaru
         $tugasBaru = $tugas->sortByDesc('created_at')->take(5);
 
         return view('siswa.dashboard', compact(
@@ -37,46 +40,57 @@ class SiswaController extends Controller
         ));
     }
 
+    /**
+     * Daftar pengumpulan siswa
+     */
     public function daftarPengumpulan()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-        $pengumpulan = Pengumpulan::with('tugas')
-            ->where('siswa_id', $siswa->id)
-            ->orderBy('created_at', 'desc')
+        $tugas = Tugas::where('kelas_id', $siswa->kelas_id)
+            ->orderBy('deadline', 'asc')
             ->get();
 
-        return view('siswa.pengumpulan.index', compact('pengumpulan'));
+        return view('siswa.pengumpulan.index', compact('tugas'));
     }
 
-        public function formPengumpulan()
-        {
-            $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
+    public function formPengumpulan($tugas_id)
+    {
+        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-            $tugas = Tugas::where('kelas_id', $siswa->kelas_id)->get();
+        if ($tugas_id) {
+            $tugas = Tugas::where('id', $tugas_id)->where('kelas_id', $siswa->kelas_id)->firstOrFail();
 
-            $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)->pluck('tugas_id')->toArray();
-
-            return view('siswa.pengumpulan.create', compact('tugas', 'tugasTerkumpul'));
+            return view('siswa.pengumpulan.create', compact('tugas'));
         }
 
-        public function simpanPengumpulan(Request $request)
+        $tugas = Tugas::where('kelas_id', $siswa->kelas_id)
+            ->orderBy('deadline', 'asc')
+            ->get();
+
+        $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)
+            ->pluck('tugas_id')
+            ->toArray();
+
+        return view('siswa.pengumpulan.create', compact('tugas', 'tugasTerkumpul'));
+    }
+
+    public function simpanPengumpulan(Request $request)
     {
         $request->validate([
             'tugas_id' => 'required|exists:tugas,id',
-            'file' => 'required|file|max:2048',
+            'file' => 'required|file|mimes:pdf,docx,zip,rar,jpg,png|max:2048',
+            'catatan' => 'nullable|string|max:255',
         ]);
 
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
-
         $tugas = Tugas::findOrFail($request->tugas_id);
 
-        $sudahMengumpulkan = Pengumpulan::where('tugas_id', $tugas->id)->where('siswa_id', $siswa->id)->exists();
-
-        if ($sudahMengumpulkan) {
+        if (Pengumpulan::where('tugas_id', $tugas->id)->where('siswa_id', $siswa->id)->exists()) {
             return back()->with('error', 'Anda sudah mengumpulkan tugas ini.');
         }
 
+        // Cek deadline
         if (now()->gt($tugas->deadline)) {
             return back()->with('error', 'Deadline tugas telah lewat. Anda tidak dapat mengumpulkan tugas ini.');
         }
@@ -87,47 +101,36 @@ class SiswaController extends Controller
             'tugas_id' => $request->tugas_id,
             'siswa_id' => $siswa->id,
             'file' => $path,
+            'catatan' => $request->catatan,
         ]);
 
         return redirect()->route('siswa.pengumpulan.index')->with('success', 'Tugas berhasil dikumpulkan!');
     }
 
-    public function riwayatNilai()
-    {
-        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-        $riwayat = Pengumpulan::with('tugas')
-            ->where('siswa_id', $siswa->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('siswa.pengumpulan.riwayat', compact('riwayat'));
-    }
-
+    /**
+     * Detail kelas
+     */
     public function detail($id)
     {
         $kelas = Kelas::with(['guru', 'tugas'])->findOrFail($id);
         return view('siswa.detail', compact('kelas'));
     }
 
+    /**
+     * Data kelas siswa
+     */
     public function kelas()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
-
         $kelas = Kelas::with(['guru', 'mapel', 'tugas'])->where('id', $siswa->kelas_id)->get();
 
         return view('siswa.kelas', compact('kelas'));
     }
 
-    public function nilai()
-    {
-        $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
-
-        $nilai = Pengumpulan::with('tugas')->where('siswa_id', $siswa->id)->whereNotNull('nilai')->orderBy('created_at', 'desc')->get();
-
-        return view('siswa.nilai', compact('nilai'));
-    }
-
+    /**
+     * Riwayat pengumpulan tugas
+     */
     public function riwayat()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
@@ -140,9 +143,13 @@ class SiswaController extends Controller
         return view('siswa.riwayat', compact('riwayat'));
     }
 
+    /**
+     * Profil siswa
+     */
     public function profil()
     {
         $user = Auth::user();
+
         return view('siswa.profil', [
             'user' => $user,
             'siswa' => $user->siswa,
