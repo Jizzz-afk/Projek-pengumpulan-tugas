@@ -22,20 +22,27 @@
         </div>
 
         <div class="mb-3">
-            <label for="guru_id" class="form-label fw-semibold">Wali Kelas</label>
-            <select
-                id="guru_id"
-                name="guru_id"
-                class="form-select"
+            <label for="wali_kelas" class="form-label fw-semibold">Wali Kelas</label>
+            <input
+                type="text"
+                id="wali_kelas"
+                name="wali_kelas"
+                value="{{ old('wali_kelas', $kelas->wali_kelas) }}"
+                placeholder="Nama Wali Kelas"
+                class="form-control"
                 required
             >
-                <option value="" disabled>Pilih Wali Kelas</option>
-                @foreach($guru as $g)
-                    <option value="{{ $g->id }}" {{ (old('guru_id', $kelas->guru_id) == $g->id) ? 'selected' : '' }}>
-                        {{ $g->nama }}
-                    </option>
-                @endforeach
-            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="deskripsi" class="form-label fw-semibold">Deskripsi</label>
+            <textarea
+                id="deskripsi"
+                name="deskripsi"
+                class="form-control"
+                rows="3"
+                required
+            >{{ old('deskripsi', $kelas->deskripsi) }}</textarea>
         </div>
 
         <button type="submit" class="btn btn-primary fw-semibold">Simpan</button>
