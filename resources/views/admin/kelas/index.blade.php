@@ -22,12 +22,15 @@
                     <input type="text" name="nama_kelas" placeholder="Nama Kelas" class="form-control form-control-lg" required>
                 </div>
                 <div class="col-md-5">
-                    <select name="guru_id" class="form-select form-select-lg" required>
-                        <option value="" disabled selected>Pilih Wali Kelas</option>
-                        @foreach($guru as $g)
-                            <option value="{{ $g->id }}">{{ $g->nama }}</option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="deskripsi" placeholder="Deskripsi" class="form-control form-control-lg" required>
+                </div>
+                <div class="col-md-5">
+                <select name="wali_kelas" class="form-select form-select-lg" required>
+                    <option value="" disabled selected>Pilih Wali Kelas</option>
+                    @foreach($kelas as $k)
+                        <option value="{{ $k->wali_kelas }}">{{ $k->wali_kelas }}</option>
+                    @endforeach
+                </select>
                 </div>
                 <div class="col-md-2 d-grid">
                     <button class="btn btn-primary btn-lg fw-semibold" type="submit">Tambah Kelas</button>
@@ -51,7 +54,7 @@
                 <tr>
                     <td>{{ $k->nama_kelas }}</td>
                     <td>{{ $k->deskripsi }}</td>
-                    <td>{{ $k->guru->nama ?? '-' }}</td>
+                    <td>{{ $k->wali_kelas }}</td>
                     <td class="text-center">
                         <a href="{{ url('/admin/kelas/'.$k->id.'/edit') }}" class="btn btn-sm btn-warning me-1" title="Edit Kelas">
                             <i class="bi bi-pencil-square"></i> Edit

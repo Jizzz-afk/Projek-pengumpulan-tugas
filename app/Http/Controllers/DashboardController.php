@@ -193,8 +193,7 @@ public function guruUpdate(Request $r, $id)
     public function kelasIndex()
     {
         return view('admin.kelas.index', [
-            'kelas' => Kelas::with('guru')->get(),
-            'guru' => Guru::all()
+            'kelas' => Kelas::all()
         ]);
     }
 
@@ -202,20 +201,42 @@ public function guruUpdate(Request $r, $id)
     {
         $r->validate([
             'nama_kelas' => 'required|unique:kelas,nama_kelas',
-            'guru_id' => 'required|exists:guru,id',
-        ], [
-            'nama_kelas.unique' => 'Kelas dengan nama ini sudah ada.',
-            'nama_kelas.required' => 'Nama kelas wajib diisi.',
-            'guru_id.required' => 'Pilih guru untuk kelas ini.',
-            'guru_id.exists' => 'Guru tidak ditemukan.',
+            'wali_kelas' => 'required|string',
+            'deskripsi'  => 'nullable|string',
         ]);
 
         Kelas::create([
             'nama_kelas' => $r->nama_kelas,
-            'guru_id' => $r->guru_id
+            'wali_kelas' => $r->wali_kelas,
+            'deskripsi'  => $r->deskripsi,
         ]);
 
         return back()->with('success', 'Kelas ditambahkan');
+    }
+
+    public function kelasEdit($id)
+    {
+        return view('admin.kelas.edit', [
+            'kelas' => Kelas::findOrFail($id)
+        ]);
+    }
+
+    public function kelasUpdate(Request $r, $id)
+    {
+        $r->validate([
+            'nama_kelas' => 'required|unique:kelas,nama_kelas,'.$id,
+            'wali_kelas' => 'required|string',
+            'deskripsi'  => 'nullable|string',
+        ]);
+
+        $kelas = Kelas::findOrFail($id);
+        $kelas->update([
+            'nama_kelas' => $r->nama_kelas,
+            'wali_kelas' => $r->wali_kelas,
+            'deskripsi'  => $r->deskripsi,
+        ]);
+
+        return redirect()->route('admin.kelas.index')->with('success', 'Kelas diperbarui');
     }
 
     public function kelasDelete($id)
@@ -223,26 +244,6 @@ public function guruUpdate(Request $r, $id)
         Kelas::destroy($id);
         return back()->with('success', 'Kelas dihapus');
     }
-
-    public function kelasEdit($id)
-    {
-        return view('admin.kelas.edit', [
-            'kelas' => Kelas::findOrFail($id),
-            'guru' => Guru::all()
-        ]);
-    }
-
-    public function kelasUpdate(Request $r, $id)
-    {
-        $kelas = Kelas::findOrFail($id);
-        $kelas->update([
-            'nama_kelas' => $r->nama_kelas,
-            'guru_id' => $r->guru_id
-        ]);
-
-        return redirect()->route('admin.kelas.index')->with('success', 'Kelas diperbarui');
-    }
-
 
 
     // ======================= MAPEL =======================
