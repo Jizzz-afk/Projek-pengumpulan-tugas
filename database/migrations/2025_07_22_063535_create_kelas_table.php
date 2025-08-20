@@ -10,6 +10,9 @@ class CreateKelasTable extends Migration
     {
         Schema::create('kelas', function (Blueprint $table) {
             $table->id();
+            $table->string('wali_kelas');
+            $table->unsignedBigInteger('wali_kelas_id')->nullable(); // simpan ID guru
+            $table->foreign('wali_kelas_id')->references('id')->on('guru')->onDelete('set null');
             $table->string('nama_kelas');
             $table->string('deskripsi');
             $table->timestamps();

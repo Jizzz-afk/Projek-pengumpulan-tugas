@@ -15,10 +15,12 @@ class MapelSeeder extends Seeder
         $now = Carbon::now();
 
         DB::table('mapel')->insert([
-            ['nama_mapel' => 'Matematika', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
+            ['nama_mapel' => 'PAI', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
             ['nama_mapel' => 'Bahasa Indonesia', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
+            ['nama_mapel' => 'Matematika', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
             ['nama_mapel' => 'Bahasa Inggris', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
-            ['nama_mapel' => 'Produktif RPL', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
+            ['nama_mapel' => 'Bahasa Jepang', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
+            ['nama_mapel' => 'Pkn', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
         ]);
     }
 }
