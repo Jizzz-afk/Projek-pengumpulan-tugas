@@ -26,7 +26,7 @@ class Kelas extends Model
 
     public function mapel()
     {
-        return $this->hasMany(Tugas::class);
+        return $this->hasMany(Mapel::class);
     }
     public function tugas()
     {
