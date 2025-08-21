@@ -5,6 +5,25 @@
     <h2 class="mb-2 fw-bold text-primary">Hai, {{ Auth::user()->name }} 👋</h2>
     <p class="text-muted mb-4">Berikut adalah ringkasan aktivitas tugasmu hari ini.</p>
 
+    {{-- 🔔 Peringatan Tugas Hampir Deadline --}}
+    @php
+        $soonTasks = $tugasBaru->filter(function($t) {
+            $deadline = \Carbon\Carbon::parse($t->deadline);
+            return now()->lessThan($deadline) && now()->diffInHours($deadline) <= 24;
+        });
+    @endphp
+
+    @if($soonTasks->isNotEmpty())
+        <div class="alert alert-warning shadow-sm rounded-3 mb-4">
+            <strong>⚠️ Peringatan!</strong> Ada {{ $soonTasks->count() }} tugas yang mendekati deadline:
+            <ul class="mt-2 mb-0 ps-3 small">
+                @foreach($soonTasks as $t)
+                    <li><b>{{ $t->judul }}</b> (Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }})</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="row g-3">
         <!-- ====== KIRI ====== -->
         <div class="col-lg-8">
@@ -68,14 +87,17 @@
                         @php
                             $sudahKumpul = $t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->exists();
                             $nilai = $t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->value('nilai');
+                            $isLate = now()->greaterThan(\Carbon\Carbon::parse($t->deadline)) && !$sudahKumpul;
                         @endphp
                         <li class="list-group-item py-3 d-flex justify-content-between align-items-start hover-bg">
                             <div class="me-3">
                                 <div class="fw-semibold">{{ $t->mapel->nama_mapel ?? '-' }} — {{ $t->judul }}</div>
-                                <small class="text-muted">Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y') }}</small>
+                                <small class="text-muted">Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}</small>
                             </div>
                             <div>
-                                @if($sudahKumpul && is_null($nilai))
+                                @if($isLate)
+                                    <span class="badge rounded-pill bg-danger">Terlambat</span>
+                                @elseif($sudahKumpul && is_null($nilai))
                                     <span class="badge rounded-pill bg-warning text-dark">Menunggu Nilai</span>
                                 @elseif($sudahKumpul)
                                     <span class="badge rounded-pill bg-success">Sudah Dikirim</span>
@@ -91,7 +113,7 @@
             </div>
         </div>
 
-        <!-- ====== KANAN ====== -->
+        <!-- ====== KANAN (Kalender) ====== -->
         @php
             use Carbon\Carbon;
             $today = Carbon::today();
@@ -130,19 +152,26 @@
                                 $hasTask = isset($tasksByDate[$key]);
                                 $taskCount = $hasTask ? $tasksByDate[$key]->count() : 0;
 
-                                // Cek semua tugas pada hari itu sudah dikumpulkan atau belum
                                 $allDone = false;
+                                $isLateDay = false;
                                 if ($hasTask) {
                                     $allDone = $tasksByDate[$key]->every(function($t) {
                                         return $t->pengumpulan()
                                             ->where('siswa_id', Auth::user()->siswa->id)
                                             ->exists();
                                     });
+
+                                    // kalau ada tugas lewat deadline & belum dikumpulkan
+                                    $isLateDay = $tasksByDate[$key]->contains(function($t) {
+                                        return now()->greaterThan(\Carbon\Carbon::parse($t->deadline)) &&
+                                               !$t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->exists();
+                                    });
                                 }
                             @endphp
                             <div class="calendar-cell 
                                 {{ $isToday ? 'calendar-today' : '' }} 
-                                {{ $hasTask ? ($allDone ? 'calendar-taskdone' : 'calendar-hastask') : '' }}">
+                                {{ $isLateDay ? 'calendar-late' : '' }}
+                                {{ $hasTask ? ($allDone ? 'calendar-taskdone' : (!$isLateDay ? 'calendar-hastask' : '')) : '' }}">
                                 <div class="calendar-daynum">{{ $day }}</div>
                                 @if($hasTask)
                                     <span class="calendar-dot" title="{{ $taskCount }} tugas pada {{ $date->translatedFormat('l, d M Y') }}"></span>
@@ -163,7 +192,7 @@
                         @endfor
                     </div>
 
-                    <div class="mt-3 d-flex justify-content-center gap-3">
+                    <div class="mt-3 d-flex flex-wrap justify-content-center gap-3">
                         <div class="d-flex align-items-center gap-2">
                             <span class="legend-circle today"></span>
                             <span class="tiny text-muted">Hari ini</span>
@@ -175,6 +204,10 @@
                         <div class="d-flex align-items-center gap-2">
                             <span class="legend-dot done"></span>
                             <span class="tiny text-muted">Semua tugas selesai</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="legend-dot late"></span>
+                            <span class="tiny text-muted">Tugas terlambat</span>
                         </div>
                     </div>
                 </div>
@@ -189,10 +222,7 @@
     .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.08) !important; }
     .hover-bg:hover { background: #f8faff; }
 
-    .icon-pill {
-        width: 44px; height: 44px; border-radius: 12px;
-        display: grid; place-items: center; font-size: 1.2rem;
-    }
+    .icon-pill { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; }
     .bg-soft-primary { background: #e7f1ff; color:#0d6efd; }
     .bg-soft-success { background: #eaf7f0; color:#28a745; }
 
@@ -205,14 +235,17 @@
 
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
     .calendar-cell {
-        position: relative; height: 56px; border-radius: 12px; background: #fff; border: 1px solid #eef1f5; padding: 8px; transition: .15s ease;
+        position: relative; height: 56px; border-radius: 12px; background: #fff;
+        border: 1px solid #eef1f5; padding: 8px; transition: .15s ease;
     }
     .calendar-cell:hover { box-shadow: 0 6px 14px rgba(13,110,253,.08); transform: translateY(-1px); }
     .calendar-today { box-shadow: inset 0 0 0 2px #0d6efd33; background: #f2f7ff; }
     .calendar-hastask { border-color:#ffe08a; background:#fffdf5; }
     .calendar-taskdone { border-color: #b2f2bb; background:#f6fffa; }
+    .calendar-late { border-color: #fca5a5; background:#fff5f5; }
     .calendar-dot { position:absolute; right:8px; bottom:8px; width:8px; height:8px; border-radius:50%; background:#ffc107; }
     .calendar-taskdone .calendar-dot { background:#28a745; }
+    .calendar-late .calendar-dot { background:#ef4444; }
     .calendar-popover { position:absolute; display:none; z-index:5; left:50%; bottom: calc(100% + 8px); transform: translateX(-50%); width: 260px; padding: .6rem .75rem; border-radius: 12px; background:#fff; border:1px solid #eef1f5; box-shadow: 0 12px 26px rgba(0,0,0,.12); }
     .calendar-cell:hover .calendar-popover { display:block; }
     .fade-in { animation: fadeIn .15s ease-in; }
@@ -221,6 +254,7 @@
     .legend-circle { width:14px; height:14px; border-radius:50%; box-shadow: inset 0 0 0 2px #0d6efd; background:#eaf2ff; display:inline-block; }
     .legend-dot { width:10px; height:10px; border-radius:50%; background:#ffc107; border:1px solid #ffd45b; display:inline-block; }
     .legend-dot.done { background:#28a745; border-color:#28a745; }
+    .legend-dot.late { background:#ef4444; border-color:#ef4444; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
