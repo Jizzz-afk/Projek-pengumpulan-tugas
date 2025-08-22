@@ -15,8 +15,9 @@ class GuruController extends Controller
 {
     private function isWaliKelas($guruId)
     {
-        return Kelas::where('guru_id', $guruId)->exists();
+        return Kelas::where('wali_kelas_id', $guruId)->exists();
     }
+
     // Dashboard
     public function dashboard()
     {
@@ -29,7 +30,7 @@ class GuruController extends Controller
         $jumlahMapel = Mapel::where('guru_id', $guru->id)->count();
         $jumlahTugas = Tugas::where('guru_id', $guru->id)->count();
 
-        $kelasYangDibina = Kelas::where('guru_id', $guru->id)->get();
+        $kelasYangDibina = $guru->kelasYangDibina; 
 
         $jumlahSiswaPerKelas = [];
         foreach ($kelasYangDibina as $kelas) {
@@ -40,7 +41,6 @@ class GuruController extends Controller
             'guru', 'jumlahMapel', 'jumlahTugas', 'jumlahSiswaPerKelas', 'kelasYangDibina'
         ));
     }
-
 
     // Profil
     public function profil()
@@ -54,8 +54,9 @@ class GuruController extends Controller
     public function tugas()
     {
         $guru = Guru::where('user_id', Auth::id())->first();
-        $kelas = Kelas::all(); 
-        $tugas = Tugas::where('guru_id', $guru->id)->with('mapel','kelas')->get();
+        $tugas = Tugas::where('guru_id', $guru->id)
+            ->with('mapel', 'kelas')
+            ->get();
 
         return view('guru.tugas.index', compact('tugas'));
     }
@@ -69,39 +70,38 @@ class GuruController extends Controller
         return view('guru.tugas.create', compact('mapel', 'kelas'));
     }
 
-   public function simpanTugas(Request $request)
-{
-    $request->validate([
-        'judul' => 'required|string|max:255',
-        'deskripsi' => 'nullable|string',
-        'deadline' => 'required|date',
-        'foto_tugas' => 'required|file|mimes:pdf,docx,zip,rar,jpg,png|max:2048',
-        'mapel_id' => 'required|exists:mapel,id',
-        'kelas_id' => 'required|exists:kelas,id',
-    ]);
+    public function simpanTugas(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'deadline' => 'required|date',
+            'foto_tugas' => 'required|file|mimes:pdf,docx,zip,rar,jpg,png|max:2048',
+            'mapel_id' => 'required|exists:mapel,id',
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
 
-    $guru = Guru::where('user_id', Auth::id())->first();
+        $guru = Guru::where('user_id', Auth::id())->first();
 
-    if (!$guru) {
-        return back()->with('error', 'Data guru tidak ditemukan.');
+        if (!$guru) {
+            return back()->with('error', 'Data guru tidak ditemukan.');
+        }
+
+        // Simpan file
+        $path = $request->file('foto_tugas')->store('tugas', 'public');
+
+        Tugas::create([
+            'guru_id' => $guru->id,
+            'mapel_id' => $request->mapel_id,
+            'kelas_id' => $request->kelas_id,
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi,
+            'foto_tugas' => $path,
+            'deadline' => $request->deadline,
+        ]);
+
+        return redirect()->route('guru.tugas')->with('success', 'Tugas berhasil dibuat.');
     }
-
-    // Simpan file
-    $path = $request->file('foto_tugas')->store('tugas', 'public');
-
-    Tugas::create([
-        'guru_id' => $guru->id,
-        'mapel_id' => $request->mapel_id,
-        'kelas_id' => $request->kelas_id,
-        'judul' => $request->judul,
-        'deskripsi' => $request->deskripsi,
-        'foto_tugas' => $path,
-        'deadline' => $request->deadline,
-    ]);
-
-    return redirect()->route('guru.tugas')->with('success', 'Tugas berhasil dibuat.');
-}
-
 
     public function editTugas($id)
     {

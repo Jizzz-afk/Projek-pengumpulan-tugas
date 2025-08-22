@@ -47,11 +47,12 @@
                                 </small>
                             </td>
                         </tr>
-                        @if($tugas->file)
+                        @if($tugas->foto_tugas)
                         <tr>
                             <th class="bg-light">📂 File Tugas</th>
                             <td>
-                                <a href="{{ asset('storage/tugas/' . $tugas->file) }}" target="_blank" class="btn btn-sm btn-primary rounded-pill px-3">
+                                <a href="{{ asset('storage/' . $tugas->foto_tugas) }}" target="_blank" 
+                                class="btn btn-sm btn-primary rounded-pill px-3">
                                     📥 Download Soal
                                 </a>
                             </td>

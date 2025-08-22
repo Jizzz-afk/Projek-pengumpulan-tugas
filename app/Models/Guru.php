@@ -24,7 +24,8 @@ class Guru extends Model
 
     public function kelasYangDibina()
     {
-        return $this->hasMany(Kelas::class);
+        return $this->hasMany(Kelas::class, 'wali_kelas_id');
     }
+
 
 }
