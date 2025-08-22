@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('mapel_id');
             $table->string('judul');
             $table->text('deskripsi')->nullable();
+            $table->string('foto_tugas');
             $table->date('deadline');
             $table->unsignedBigInteger('kelas_id')->nullable();
             $table->timestamps();

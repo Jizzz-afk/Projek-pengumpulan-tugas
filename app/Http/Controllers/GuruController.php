@@ -69,12 +69,13 @@ class GuruController extends Controller
         return view('guru.tugas.create', compact('mapel', 'kelas'));
     }
 
-    public function simpanTugas(Request $request)
+   public function simpanTugas(Request $request)
 {
     $request->validate([
         'judul' => 'required|string|max:255',
         'deskripsi' => 'nullable|string',
         'deadline' => 'required|date',
+        'foto_tugas' => 'required|file|mimes:pdf,docx,zip,rar,jpg,png|max:2048',
         'mapel_id' => 'required|exists:mapel,id',
         'kelas_id' => 'required|exists:kelas,id',
     ]);
@@ -85,16 +86,22 @@ class GuruController extends Controller
         return back()->with('error', 'Data guru tidak ditemukan.');
     }
 
+    // Simpan file
+    $path = $request->file('foto_tugas')->store('tugas', 'public');
+
     Tugas::create([
-        'guru_id' => $guru->id, 
+        'guru_id' => $guru->id,
         'mapel_id' => $request->mapel_id,
         'kelas_id' => $request->kelas_id,
         'judul' => $request->judul,
         'deskripsi' => $request->deskripsi,
+        'foto_tugas' => $path,
         'deadline' => $request->deadline,
     ]);
+
     return redirect()->route('guru.tugas')->with('success', 'Tugas berhasil dibuat.');
 }
+
 
     public function editTugas($id)
     {

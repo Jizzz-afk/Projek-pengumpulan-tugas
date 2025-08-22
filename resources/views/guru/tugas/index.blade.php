@@ -14,6 +14,7 @@
             <thead class="table-primary">
                 <tr>
                     <th>Judul</th>
+                    <th>Foto</th>
                     <th>Mapel</th>
                     <th>Kelas</th>
                     <th>Deadline</th>
@@ -24,6 +25,30 @@
                 @foreach($tugas as $item)
                     <tr>
                         <td class="fw-semibold">{{ $item->judul }}</td>
+                        <td>
+
+                            @if($item->foto_tugas)
+                            @php
+        $ext = pathinfo($item->foto_tugas, PATHINFO_EXTENSION);
+    @endphp
+
+    @if(in_array(strtolower($ext), ['jpg','jpeg','png']))
+        <img src="{{ asset('storage/'.$item->foto_tugas) }}" 
+             alt="Foto Tugas" 
+             class="img-thumbnail" 
+             style="max-width: 80px; max-height: 80px;">
+             @else
+             <a href="{{ asset('storage/'.$item->foto_tugas) }}" 
+             target="_blank" 
+             class="btn btn-sm btn-outline-primary">
+             <i class="bi bi-file-earmark-arrow-down"></i> Download
+            </a>
+            @endif
+            @else
+            <span class="text-muted">-</span>
+            @endif
+        </td>
+            
                         <td>{{ $item->mapel->nama_mapel ?? '-' }}</td>
                         <td>{{ $item->kelas->nama_kelas ?? '-' }}</td>
                         <td>
