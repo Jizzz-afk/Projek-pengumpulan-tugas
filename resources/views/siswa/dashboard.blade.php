@@ -3,10 +3,11 @@
 @section('content')
 <div class="container py-4">
     <h2 class="mb-2 fw-bold text-primary">Hai, {{ Auth::user()->name }} 👋</h2>
-    <p class="text-muted mb-4">Berikut adalah ringkasan aktivitas tugasmu hari ini.</p>
+    <p class="text-muted mb-4">Berikut ringkasan aktivitas tugasmu hari ini.</p>
 
     {{-- 🔔 Peringatan Tugas Hampir Deadline --}}
     @php
+        \Carbon\Carbon::setLocale('id'); // <-- supaya bahasa Indo
         $soonTasks = $tugasBaru->filter(function($t) {
             $deadline = \Carbon\Carbon::parse($t->deadline);
             return now()->lessThan($deadline) && now()->diffInHours($deadline) <= 24;
@@ -14,23 +15,83 @@
     @endphp
 
     @if($soonTasks->isNotEmpty())
-        <div class="alert alert-warning shadow-sm rounded-3 mb-4">
-            <strong>⚠️ Peringatan!</strong> Ada {{ $soonTasks->count() }} tugas yang mendekati deadline:
-            <ul class="mt-2 mb-0 ps-3 small">
-                @foreach($soonTasks as $t)
-                    <li><b>{{ $t->judul }}</b> (Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }})</li>
-                @endforeach
-            </ul>
+        <div class="card border-0 shadow-sm mb-4 rounded-4">
+            <div class="card-body p-3">
+                {{-- Header Alert --}}
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-warning me-2 fs-4 animate-pulse"></i>
+                    <h6 class="fw-bold m-0 text-danger">⚠️ Deadline Hampir Tiba!</h6>
+                </div>
+
+                <p class="small text-muted mb-3">
+                    Ada <b>{{ $soonTasks->count() }}</b> tugas yang akan berakhir dalam <b>24 jam</b>.  
+                    Segera kerjakan sebelum terlambat 🚀
+                </p>
+
+                {{-- List Tugas --}}
+                <div class="list-group border-0">
+                    @foreach($soonTasks as $t)
+                        @php
+                            $deadline = \Carbon\Carbon::parse($t->deadline);
+                            $totalMinutes = now()->diffInMinutes($deadline);
+
+                            // Progress: makin dekat deadline makin penuh
+                            $progress = max(5, 100 - ($totalMinutes / (24 * 60) * 100));
+
+                            // Warna progress dinamis
+                            $progressColor = $totalMinutes <= 60
+                                ? 'bg-danger'
+                                : ($totalMinutes <= 180
+                                    ? 'bg-orange'
+                                    : 'bg-warning');
+                        @endphp
+
+                        <div class="list-group-item border-0 px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-semibold">{{ $t->judul }}</span>
+                                <span class="badge bg-light text-dark">
+                                    {{ $deadline->format('d M Y H:i') }}
+                                </span>
+                            </div>
+
+                            {{-- Progress bar --}}
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar {{ $progressColor }}" role="progressbar"
+                                    style="width: {{ $progress }}%"
+                                    aria-valuenow="{{ $progress }}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+
+                            {{-- Countdown --}}
+                            <small class="d-block mt-1">
+                                ⏳ <span class="badge {{ $totalMinutes <= 60 ? 'bg-danger' : 'bg-warning text-dark' }}">
+                                    {{ $deadline->diffForHumans(now(), ['parts' => 2, 'join' => true]) }}
+                                </span>
+                            </small>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
         </div>
     @endif
 
+    {{-- ==== STYLE EXTRA ==== --}}
+    <style>
+        .animate-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 
+            0%,100% { opacity:1; transform:scale(1);} 
+            50% {opacity:.6; transform:scale(1.1);} 
+        }
+        .bg-orange { background-color: #fb923c !important; }
+    </style>
+    
     <div class="row g-3">
         <!-- ====== KIRI ====== -->
         <div class="col-lg-8">
             <!-- Ringkasan -->
             <div class="row g-3 mb-3">
                 <div class="col-12 col-sm-4">
-                    <div class="card summary-card h-100 shadow-sm border-0 hover-lift">
+                    <div class="card h-100 shadow-sm border-0 hover-lift">
                         <div class="card-body d-flex align-items-center gap-3">
                             <div class="icon-pill bg-soft-primary">
                                 <i class="bi bi-journal-text"></i>
@@ -45,7 +106,7 @@
                 </div>
 
                 <div class="col-12 col-sm-4">
-                    <div class="card summary-card h-100 shadow-sm border-0 hover-lift">
+                    <div class="card h-100 shadow-sm border-0 hover-lift">
                         <div class="card-body d-flex align-items-center gap-3">
                             <div class="icon-pill bg-soft-success">
                                 <i class="bi bi-check-circle"></i>
@@ -59,8 +120,9 @@
                     </div>
                 </div>
 
+                <!-- Donut Nilai -->
                 <div class="col-12 col-sm-4">
-                    <div class="card summary-card h-100 shadow-sm border-0 hover-lift">
+                    <div class="card h-100 shadow-sm border-0 hover-lift">
                         <div class="card-body d-flex align-items-center gap-3">
                             <div class="ms-auto me-auto">
                                 <div class="donut-wrap glow">
@@ -91,8 +153,14 @@
                         @endphp
                         <li class="list-group-item py-3 d-flex justify-content-between align-items-start hover-bg">
                             <div class="me-3">
-                                <div class="fw-semibold">{{ $t->mapel->nama_mapel ?? '-' }} — {{ $t->judul }}</div>
-                                <small class="text-muted">Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}</small>
+                                <div class="fw-semibold">
+                                    <i class="bi bi-journal-bookmark me-1 text-primary"></i>
+                                    {{ $t->mapel->nama_mapel ?? '-' }} — {{ $t->judul }}
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}
+                                </small>
                             </div>
                             <div>
                                 @if($isLate)
@@ -133,12 +201,14 @@
                     <h6 class="m-0 fw-bold text-primary text-uppercase small">{{ $today->translatedFormat('F Y') }}</h6>
                 </div>
                 <div class="card-body pt-2">
+                    <!-- Header Hari -->
                     <div class="calendar-grid calendar-header mb-1">
                         @foreach($daysOfWeek as $d)
                             <div class="text-center fw-semibold tiny text-secondary">{{ $d }}</div>
                         @endforeach
                     </div>
 
+                    <!-- Grid Kalender -->
                     <div class="calendar-grid">
                         @for ($i = 0; $i < $firstDayOfWeek; $i++)
                             <div class="calendar-cell calendar-empty"></div>
@@ -155,17 +225,13 @@
                                 $allDone = false;
                                 $isLateDay = false;
                                 if ($hasTask) {
-                                    $allDone = $tasksByDate[$key]->every(function($t) {
-                                        return $t->pengumpulan()
-                                            ->where('siswa_id', Auth::user()->siswa->id)
-                                            ->exists();
-                                    });
-
-                                    // kalau ada tugas lewat deadline & belum dikumpulkan
-                                    $isLateDay = $tasksByDate[$key]->contains(function($t) {
-                                        return now()->greaterThan(\Carbon\Carbon::parse($t->deadline)) &&
-                                               !$t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->exists();
-                                    });
+                                    $allDone = $tasksByDate[$key]->every(fn($t) =>
+                                        $t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->exists()
+                                    );
+                                    $isLateDay = $tasksByDate[$key]->contains(fn($t) =>
+                                        now()->greaterThan(\Carbon\Carbon::parse($t->deadline)) &&
+                                        !$t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->exists()
+                                    );
                                 }
                             @endphp
                             <div class="calendar-cell 
@@ -174,8 +240,8 @@
                                 {{ $hasTask ? ($allDone ? 'calendar-taskdone' : (!$isLateDay ? 'calendar-hastask' : '')) : '' }}">
                                 <div class="calendar-daynum">{{ $day }}</div>
                                 @if($hasTask)
-                                    <span class="calendar-dot" title="{{ $taskCount }} tugas pada {{ $date->translatedFormat('l, d M Y') }}"></span>
-                                    <div class="calendar-popover fade-in">
+                                    <span class="calendar-dot"></span>
+                                    <div class="calendar-popover">
                                         <div class="fw-semibold mb-1">{{ $date->translatedFormat('l, d M Y') }}</div>
                                         <ul class="mb-0 ps-3 small">
                                             @foreach($tasksByDate[$key] as $t)
@@ -192,6 +258,7 @@
                         @endfor
                     </div>
 
+                    <!-- Legend -->
                     <div class="mt-3 d-flex flex-wrap justify-content-center gap-3">
                         <div class="d-flex align-items-center gap-2">
                             <span class="legend-circle today"></span>
@@ -199,11 +266,11 @@
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="legend-dot"></span>
-                            <span class="tiny text-muted">Ada tugas (belum semua selesai)</span>
+                            <span class="tiny text-muted">Ada tugas</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="legend-dot done"></span>
-                            <span class="tiny text-muted">Semua tugas selesai</span>
+                            <span class="tiny text-muted">Semua selesai</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="legend-dot late"></span>
@@ -216,47 +283,59 @@
     </div>
 </div>
 
+{{-- ==== STYLE ==== --}}
 <style>
-    .tiny { font-size: .78rem; }
-    .hover-lift { transition: all .2s ease; }
-    .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.08) !important; }
-    .hover-bg:hover { background: #f8faff; }
+    .tiny { font-size: .8rem; }
+    .hover-lift { transition: all .25s ease; }
+    .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 24px rgba(0,0,0,.08) !important; }
+    .hover-bg:hover { background: #f9fbff; }
 
-    .icon-pill { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; }
-    .bg-soft-primary { background: #e7f1ff; color:#0d6efd; }
-    .bg-soft-success { background: #eaf7f0; color:#28a745; }
+    .icon-pill { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem; }
+    .bg-soft-primary { background: #eef4ff; color:#2563eb; }
+    .bg-soft-success { background: #ecfdf5; color:#16a34a; }
 
     .donut-wrap { position: relative; width: 96px; height: 96px; }
     .donut-label { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; font-size: .95rem; }
     .donut-label.red { color: #ef4444; }
     .donut-label.yellow { color: #facc15; }
     .donut-label.green { color: #22c55e; }
-    .glow { filter: drop-shadow(0 0 6px rgba(59,130,246,0.4)); }
+    .glow { filter: drop-shadow(0 0 8px rgba(59,130,246,0.3)); }
 
+    /* Kalender */
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
     .calendar-cell {
-        position: relative; height: 56px; border-radius: 12px; background: #fff;
-        border: 1px solid #eef1f5; padding: 8px; transition: .15s ease;
+        position: relative; height: 65px; border-radius: 14px;
+        background: #fff; border: 1px solid #edf0f6;
+        padding: 6px; transition: .2s ease;
+        display:flex; align-items:flex-start; justify-content:flex-start;
     }
-    .calendar-cell:hover { box-shadow: 0 6px 14px rgba(13,110,253,.08); transform: translateY(-1px); }
-    .calendar-today { box-shadow: inset 0 0 0 2px #0d6efd33; background: #f2f7ff; }
-    .calendar-hastask { border-color:#ffe08a; background:#fffdf5; }
-    .calendar-taskdone { border-color: #b2f2bb; background:#f6fffa; }
-    .calendar-late { border-color: #fca5a5; background:#fff5f5; }
-    .calendar-dot { position:absolute; right:8px; bottom:8px; width:8px; height:8px; border-radius:50%; background:#ffc107; }
-    .calendar-taskdone .calendar-dot { background:#28a745; }
+    .calendar-cell:hover { box-shadow: 0 6px 16px rgba(59,130,246,.12); transform: translateY(-2px); }
+    .calendar-daynum { font-size:.9rem; font-weight:600; color:#334155; }
+    .calendar-today { border: 2px solid #3b82f6; background: #eff6ff; }
+    .calendar-hastask { border-color:#fde68a; background:#fffbeb; }
+    .calendar-taskdone { border-color: #bbf7d0; background:#f0fdf4; }
+    .calendar-late { border-color: #fecaca; background:#fef2f2; }
+    .calendar-dot { position:absolute; right:8px; bottom:8px; width:9px; height:9px; border-radius:50%; background:#fbbf24; }
+    .calendar-taskdone .calendar-dot { background:#22c55e; }
     .calendar-late .calendar-dot { background:#ef4444; }
-    .calendar-popover { position:absolute; display:none; z-index:5; left:50%; bottom: calc(100% + 8px); transform: translateX(-50%); width: 260px; padding: .6rem .75rem; border-radius: 12px; background:#fff; border:1px solid #eef1f5; box-shadow: 0 12px 26px rgba(0,0,0,.12); }
-    .calendar-cell:hover .calendar-popover { display:block; }
-    .fade-in { animation: fadeIn .15s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 5px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-    .legend-circle { width:14px; height:14px; border-radius:50%; box-shadow: inset 0 0 0 2px #0d6efd; background:#eaf2ff; display:inline-block; }
-    .legend-dot { width:10px; height:10px; border-radius:50%; background:#ffc107; border:1px solid #ffd45b; display:inline-block; }
-    .legend-dot.done { background:#28a745; border-color:#28a745; }
+    .calendar-popover {
+        position:absolute; display:none; z-index:5; left:50%; bottom: calc(100% + 10px);
+        transform: translateX(-50%) scale(.95); width: 250px; padding: .7rem .8rem;
+        border-radius: 12px; background:#fff; border:1px solid #eef1f5;
+        box-shadow: 0 12px 26px rgba(0,0,0,.12);
+        animation: fadeIn .2s ease forwards;
+    }
+    .calendar-cell:hover .calendar-popover { display:block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 8px) scale(.95); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+
+    .legend-circle { width:14px; height:14px; border-radius:50%; box-shadow: inset 0 0 0 2px #3b82f6; background:#eff6ff; display:inline-block; }
+    .legend-dot { width:10px; height:10px; border-radius:50%; background:#fbbf24; border:1px solid #fcd34d; display:inline-block; }
+    .legend-dot.done { background:#22c55e; border-color:#22c55e; }
     .legend-dot.late { background:#ef4444; border-color:#ef4444; }
 </style>
 
+{{-- ==== CHART NILAI ==== --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -265,13 +344,13 @@ document.addEventListener('DOMContentLoaded', function () {
     let warna;
 
     if (nilai < 50) {
-        warna = '#ef4444'; // merah
+        warna = '#ef4444';
         document.getElementById('nilaiLabel').classList.add('red');
     } else if (nilai < 75) {
-        warna = '#facc15'; // kuning
+        warna = '#facc15';
         document.getElementById('nilaiLabel').classList.add('yellow');
     } else {
-        warna = '#22c55e'; // hijau
+        warna = '#22c55e';
         document.getElementById('nilaiLabel').classList.add('green');
     }
 
