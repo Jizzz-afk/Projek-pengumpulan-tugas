@@ -217,7 +217,8 @@ public function guruUpdate(Request $r, $id)
     public function kelasEdit($id)
     {
         return view('admin.kelas.edit', [
-            'kelas' => Kelas::findOrFail($id)
+            'kelas' => Kelas::findOrFail($id),
+            'daftarWaliK' => Kelas::select('wali_kelas')->distinct()->get()
         ]);
     }
 
@@ -249,9 +250,11 @@ public function guruUpdate(Request $r, $id)
     // ======================= MAPEL =======================
     public function mapelIndex()
     {
+        $guruDipakai = Mapel::pluck('guru_id')->toArray();
+
         return view('admin.mapel.index', [
             'mapel' => Mapel::with('guru')->get(),
-            'guru' => Guru::all()
+            'guru' => Guru::whereNotIn('id', $guruDipakai)->get()
         ]);
     }
 
@@ -268,20 +271,6 @@ public function guruUpdate(Request $r, $id)
         return back()->with('success', 'Mapel ditambahkan');
     }
 
-    public function mapelDelete($id)
-    {
-        Mapel::destroy($id);
-        return back()->with('success', 'Mapel dihapus');
-    }
-
-    public function mapelEdit($id)
-    {
-        return view('admin.mapel.edit', [
-            'mapel' => Mapel::findOrFail($id),
-            'guru' => Guru::all()
-        ]);
-    }
-
     public function mapelUpdate(Request $r, $id)
     {
         $r->validate([
@@ -295,7 +284,23 @@ public function guruUpdate(Request $r, $id)
             'guru_id' => $r->guru_id
         ]);
         return redirect()->route('admin.mapel.index')->with('success', 'Mapel diperbarui');
-
     }
 
+    public function mapelDelete($id)
+    {
+        Mapel::destroy($id);
+        return back()->with('success', 'Mapel dihapus');
+    }
+
+    public function mapelEdit($id)
+    {
+        $mapel = Mapel::findOrFail($id);
+
+        $guruDipakai = Mapel::where('id', '!=', $id)->pluck('guru_id')->toArray();
+
+        return view('admin.mapel.edit', [
+            'mapel' => $mapel,
+            'guru' => Guru::whereNotIn('id', $guruDipakai)->orWhere('id', $mapel->guru_id)->get()
+        ]);
+    }
 }

@@ -22,15 +22,10 @@
 
         <div class="mb-3">
             <label for="guru_id" class="form-label fw-semibold">Guru Pengajar</label>
-            <select
-                id="guru_id"
-                name="guru_id"
-                class="form-select"
-                required
-            >
+            <select id="guru_id" name="guru_id" class="form-select" required>
                 <option value="" disabled>Pilih Guru Pengajar</option>
                 @foreach($guru as $g)
-                    <option value="{{ $g->id }}" {{ (old('guru_id', $mapel->guru_id) == $g->id) ? 'selected' : '' }}>
+                    <option value="{{ $g->id }}" {{ (old('guru_id', $mapel->guru_id ?? null) == $g->id) ? 'selected' : '' }}>
                         {{ $g->nama }}
                     </option>
                 @endforeach
