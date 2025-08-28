@@ -9,9 +9,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\CekRole;
 
 Route::get('/', function () {
-    return view('auth.login');
+    if (Auth::check()) {
+        return redirect()->intended(auth::user()->role . '/dashboard');
+    }
+    return redirect()->route('login');
 });
-;
+
 
 Route::middleware(['auth', CekRole::class . ':admin' ])->prefix('admin')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('admin.dashboard');

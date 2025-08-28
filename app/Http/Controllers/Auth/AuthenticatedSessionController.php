@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Tampilkan form login.
      */
     public function create(): View
     {
@@ -20,43 +20,35 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Proses login.
      */
-    public function store(Request $request): RedirectResponse
-{
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        // Authentikasi bawaan Breeze
+        $request->authenticate();
 
-    if (Auth::attempt($credentials)) {
+        // Regenerasi session biar aman
         $request->session()->regenerate();
 
+        // Redirect sesuai role user
         $role = Auth::user()->role;
 
         return match ($role) {
             'admin' => redirect()->intended('/admin/dashboard'),
-            'guru' => redirect()->intended('/guru/dashboard'),
+            'guru'  => redirect()->intended('/guru/dashboard'),
             'siswa' => redirect()->intended('/siswa/dashboard'),
-            default => redirect('/'),
+            default => redirect()->intended('/'),
         };
     }
 
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ])->withInput();
-}
-
-
     /**
-     * Destroy an authenticated session.
+     * Logout user.
      */
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');
