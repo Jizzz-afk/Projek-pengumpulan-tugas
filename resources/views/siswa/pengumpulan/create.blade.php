@@ -64,7 +64,7 @@
                                 <td>
                                     <div class="border rounded-4 p-3 bg-light shadow-sm text-center">
                                         <img src="{{ asset('storage/' . $tugas->foto_tugas) }}" 
-                                             alt="Soal Tugas" class="img-fluid rounded-4 shadow-sm" style="max-height: 400px; object-fit: contain;">
+                                            alt="Soal Tugas" class="img-fluid rounded-4 shadow-sm" style="max-height: 400px; object-fit: contain;">
                                     </div>
                                 </td>
                             </tr>
@@ -93,8 +93,8 @@
                         {{-- Upload Multiple Files --}}
                         <div class="mb-4">
                             <label class="form-label fw-semibold">📎 File Tugas</label>
-                            <input type="file" name="files[]" class="form-control rounded-3 shadow-sm" 
-                                   accept=".pdf,.docx,.zip,.rar,.jpg,.png" multiple required>
+                            <input type="file" name="file" class="form-control rounded-3 shadow-sm" 
+                                accept=".pdf,.docx,.zip,.rar,.jpg,.png" multiple required>
                             <small class="text-muted d-block mt-1">Bisa upload lebih dari 1 file (PDF, DOCX, ZIP, RAR, JPG, PNG, Max: 2MB per file)</small>
                         </div>
 

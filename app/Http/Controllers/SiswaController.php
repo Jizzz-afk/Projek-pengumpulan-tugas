@@ -17,22 +17,13 @@ class SiswaController extends Controller
     public function dashboard()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
-
-        // Semua tugas sesuai kelas siswa
         $tugas = Tugas::where('kelas_id', $siswa->kelas_id)->get();
-
-        // Hitung jumlah tugas aktif (belum lewat deadline)
         $tugasAktif = $tugas->where('deadline', '>=', now())->count();
-
-        // Hitung tugas yang sudah dikumpulkan
         $tugasTerkumpul = Pengumpulan::where('siswa_id', $siswa->id)->count();
-
-        // Hitung rata-rata nilai
         $rataNilai = Pengumpulan::where('siswa_id', $siswa->id)
             ->whereNotNull('nilai')
             ->avg('nilai') ?? 0;
 
-        // Ambil 5 tugas terbaru
         $tugasBaru = $tugas->sortByDesc('created_at')->take(5);
 
         return view('siswa.dashboard', compact(
