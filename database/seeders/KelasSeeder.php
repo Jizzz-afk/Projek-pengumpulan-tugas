@@ -32,7 +32,7 @@ class KelasSeeder extends Seeder
 
             ['wali_kelas' => 'Bu Lestari',   'nama_kelas' => 'XII TITL 1', 'deskripsi' => 'Kelas 12 Teknik Instalasi Tenaga Listrik 1', 'created_at' => $now, 'updated_at' => $now],
             ['wali_kelas' => 'Pak Eko',      'nama_kelas' => 'XII TITL 2', 'deskripsi' => 'Kelas 12 Teknik Instalasi Tenaga Listrik 2', 'created_at' => $now, 'updated_at' => $now],
-            ['wali_kelas' => 'Bu Ayu',       'nama_kelas' => 'XII TITL 3', 'deskripsi' => 'Kelas 12 Teknik Instalasi Tenaga Listrik 3', 'created_at' => $now, 'updated_at' => $now],
+            ['wali_kelas' => 'Bu Rini',      'nama_kelas' => 'XII TITL 3', 'deskripsi' => 'Kelas 12 Teknik Instalasi Tenaga Listrik 3', 'created_at' => $now, 'updated_at' => $now],
 
             ['wali_kelas' => 'Pak Doni',     'nama_kelas' => 'XII TPTUP',  'deskripsi' => 'Kelas 12 Teknik Pengelasan dan Teknik Usaha Produksi', 'created_at' => $now, 'updated_at' => $now],
 
