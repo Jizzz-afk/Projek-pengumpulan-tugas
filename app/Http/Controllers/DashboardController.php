@@ -217,7 +217,8 @@ public function guruUpdate(Request $r, $id)
     public function kelasEdit($id)
     {
         return view('admin.kelas.edit', [
-            'kelas' => Kelas::findOrFail($id)
+            'kelas' => Kelas::findOrFail($id),
+            'daftarWaliK' => Kelas::select('wali_kelas')->distinct()->get()
         ]);
     }
 
@@ -249,26 +250,41 @@ public function guruUpdate(Request $r, $id)
     // ======================= MAPEL =======================
     public function mapelIndex()
     {
+        $guruDipakai = Mapel::pluck('guru_id')->toArray();
+
         return view('admin.mapel.index', [
             'mapel' => Mapel::with('guru')->get(),
-            'guru' => Guru::all()
+            'guru' => Guru::whereNotIn('id', $guruDipakai)->get()
         ]);
     }
 
     public function mapelStore(Request $r)
-{
-    $r->validate([
-        'nama_mapel' => 'required|unique:mapel,nama_mapel',
-        'guru_id'    => 'required|unique:mapel,guru_id', // guru hanya boleh dipakai 1 mapel
-    ]);
+    {
+        $r->validate([
+            'nama_mapel' => 'required|unique:mapel,nama_mapel',
+            'guru_id' => 'required|exists:guru,id',
+        ]);
+        Mapel::create([
+            'nama_mapel' => $r->nama_mapel,
+            'guru_id' => $r->guru_id
+        ]);
+        return back()->with('success', 'Mapel ditambahkan');
+    }
 
-    Mapel::create([
-        'nama_mapel' => $r->nama_mapel,
-        'guru_id'    => $r->guru_id
-    ]);
+    public function mapelUpdate(Request $r, $id)
+    {
+        $r->validate([
+            'nama_mapel' => 'required|unique:mapel,nama_mapel,' . $id,
+            'guru_id' => 'required|exists:guru,id',
+        ]);
 
-    return back()->with('success', 'Mapel ditambahkan');
-}
+        $mapel = Mapel::findOrFail($id);
+        $mapel->update([
+            'nama_mapel' => $r->nama_mapel,
+            'guru_id' => $r->guru_id
+        ]);
+        return redirect()->route('admin.mapel.index')->with('success', 'Mapel diperbarui');
+    }
 
     public function mapelDelete($id)
     {
@@ -278,26 +294,13 @@ public function guruUpdate(Request $r, $id)
 
     public function mapelEdit($id)
     {
+        $mapel = Mapel::findOrFail($id);
+
+        $guruDipakai = Mapel::where('id', '!=', $id)->pluck('guru_id')->toArray();
+
         return view('admin.mapel.edit', [
-            'mapel' => Mapel::findOrFail($id),
-            'guru' => Guru::all()
+            'mapel' => $mapel,
+            'guru' => Guru::whereNotIn('id', $guruDipakai)->orWhere('id', $mapel->guru_id)->get()
         ]);
     }
-
-    public function mapelUpdate(Request $r, $id)
-{
-    $r->validate([
-        'nama_mapel' => 'required|unique:mapel,nama_mapel,' . $id,
-        'guru_id'    => 'required|unique:mapel,guru_id,' . $id, // biar guru yg lama tetap bisa dipakai
-    ]);
-
-    $mapel = Mapel::findOrFail($id);
-    $mapel->update([
-        'nama_mapel' => $r->nama_mapel,
-        'guru_id'    => $r->guru_id
-    ]);
-
-    return redirect()->route('admin.mapel.index')->with('success', 'Mapel diperbarui');
-}
-
 }

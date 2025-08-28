@@ -21,18 +21,18 @@
             >
         </div>
 
-        <div class="mb-3">
-            <label for="wali_kelas" class="form-label fw-semibold">Wali Kelas</label>
-            <input
-                type="text"
-                id="wali_kelas"
-                name="wali_kelas"
-                value="{{ old('wali_kelas', $kelas->wali_kelas) }}"
-                placeholder="Nama Wali Kelas"
-                class="form-control"
-                required
-            >
-        </div>
+    <div class="col-md-3">
+        <label for="wali_kelas" class="form-label fw-semibold">Guru Pengajar</label>
+        <select id="wali_kelas" name="wali_kelas" class="form-select" required>
+            <option value="" disabled>Pilih Guru Pengajar</option>
+            @foreach($daftarWaliK as $k)
+                <option value="{{ $k->wali_kelas }}" 
+                    {{ $kelas->wali_kelas == $k->wali_kelas ? 'selected' : '' }}>
+                    {{ $k->wali_kelas }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
         <div class="mb-3">
             <label for="deskripsi" class="form-label fw-semibold">Deskripsi</label>
