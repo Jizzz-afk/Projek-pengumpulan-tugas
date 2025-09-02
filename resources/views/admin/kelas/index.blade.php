@@ -32,7 +32,7 @@
                     @endforeach
                 </select>
                 </div>
-                <div class="col-md-2 d-grid">
+                <div class="d-grid">
                     <button class="btn btn-primary btn-lg fw-semibold" type="submit">Tambah Kelas</button>
                 </div>
             </form>
