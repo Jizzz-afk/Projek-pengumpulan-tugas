@@ -34,20 +34,6 @@
         </div>
     @endif
 
-    {{-- Statistik Utama --}}
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-gradient-primary shadow-sm h-100 card-hover">
-                <div class="card-body d-flex align-items-center">
-                    <i class="bi bi-journal-text fs-1 me-3"></i>
-                    <div>
-                        <h6 class="text-uppercase mb-1">Jumlah Mapel</h6>
-                        <h2 class="fw-bold mb-0">{{ $jumlahMapel }}</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="col-md-4">
             <div class="card text-white bg-gradient-success shadow-sm h-100 card-hover">
                 <div class="card-body d-flex align-items-center">

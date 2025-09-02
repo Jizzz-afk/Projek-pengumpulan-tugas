@@ -32,16 +32,7 @@
             <label for="email" class="form-label">Email</label>
             <input type="email" id="email" name="email" class="form-control" value="{{ old('email', $guru->email) }}" required>
         </div>
-
-        <div class="col-md-6">
-            <label for="foto" class="form-label">Foto</label>
-            <input type="file" id="foto" name="foto" class="form-control">
-            @if($guru->foto)
-                <small class="text-muted">Foto saat ini:</small><br>
-                <img src="{{ asset('storage/'.$guru->foto) }}" alt="Foto Guru" class="img-thumbnail mt-2" style="max-width: 150px;">
-            @endif
-        </div>
-
+        
         <div class="col-12 mt-3">
             <button type="submit" class="btn btn-primary fw-semibold">Simpan Perubahan</button>
             <a href="{{ url('/admin/guru') }}" class="btn btn-secondary ms-2">Batal</a>

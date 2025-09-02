@@ -21,8 +21,9 @@
         <table class="table modern-table align-middle mb-0 w-100">
             <thead>
                 <tr>
-                    <th style="width: 40%;">Judul</th>
-                    <th style="width: 25%;">Deadline</th>
+                    <th style="width: 20%;">Judul</th>
+                    <th style="width: 15%;">Mapel</th>
+                    <th style="width: 20%;">Deadline</th>
                     <th style="width: 20%;">Status</th>
                     <th style="width: 15%;" class="text-center">Aksi</th>
                 </tr>
@@ -40,6 +41,11 @@
                         <td>
                             <div class="fw-semibold text-dark">{{ $t->judul }}</div>
                             <div class="desc-text">{{ $t->deskripsi ?? '-' }}</div>
+                        </td>
+
+                        <!-- Mapel -->
+                        <td>
+                            {{ $t->mapel->nama_mapel ?? '-' }}
                         </td>
 
                         <!-- Deadline -->
@@ -76,7 +82,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center py-5">
+                        <td colspan="5" class="text-center py-5">
                             <div class="d-flex flex-column align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"
                                      fill="currentColor" class="text-secondary mb-3 animate-book"
@@ -103,7 +109,6 @@
         </table>
     </div>
 </div>
-
 {{-- CSS --}}
 <style>
     .text-gradient {

@@ -3,24 +3,57 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use App\Models\Guru;
+use App\Models\Mapel;
 use Carbon\Carbon;
 
 class MapelSeeder extends Seeder
 {
     public function run(): void
     {
-        $guru = Guru::first(); // ambil guru pertama
         $now = Carbon::now();
+        $gurus = Guru::all(); // Ambil semua guru
 
-        DB::table('mapel')->insert([
-            ['nama_mapel' => 'PAI', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
-            ['nama_mapel' => 'Bahasa Indonesia', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
-            ['nama_mapel' => 'Matematika', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
-            ['nama_mapel' => 'Bahasa Inggris', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
-            ['nama_mapel' => 'Bahasa Jepang', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
-            ['nama_mapel' => 'Pkn', 'guru_id' => $guru?->id, 'created_at' => $now, 'updated_at' => $now],
-        ]);
+        // Daftar mapel sesuai kurikulum (bisa disesuaikan)
+        $namaMapels = [
+            'PAI',
+            'Bahasa Indonesia',
+            'Matematika',
+            'Bahasa Inggris',
+            'Bahasa Jepang',
+            'PKN',
+            'Produktif TKJ',
+            'Produktif RPL',
+            'Produktif TEI',
+            'Produktif TITL',
+            'Produktif TPM',
+            'Produktif TKR',
+            'Produktif TPTUP',
+            'Produktif TOI',
+            'Produktif DPIB',
+            'Seni Budaya',
+            'Penjas',
+            'Simulasi Digital',
+            'Kewirausahaan',
+            'Fisika',
+            'Kimia',
+            'Biologi',
+            'Sejarah',
+            'Geografi',
+        ];
+
+        foreach ($gurus as $index => $guru) {
+            // Kalau guru lebih banyak dari daftar mapel, kasih nama otomatis
+            $namaMapel = $namaMapels[$index] ?? 'Mapel ' . ($index + 1);
+
+            // Cek dulu, kalau belum ada baru buat
+            Mapel::updateOrCreate(
+                ['nama_mapel' => $namaMapel], // cek berdasarkan nama_mapel
+                [
+                    'guru_id' => $guru->id,
+                    'updated_at' => $now,
+                ]
+            );
+        }
     }
 }
