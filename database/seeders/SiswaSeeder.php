@@ -7,13 +7,22 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Siswa;
 use App\Models\Kelas;
+use Faker\Factory as Faker;
 
 class SiswaSeeder extends Seeder
 {
     public function run(): void
     {
+        $faker = Faker::create('id_ID');
         $kelasList = Kelas::all();
         $nisStart = 12329000; // Awal NIS
+
+        // Nama depan A-Z (umum dipakai di Indonesia)
+        $namaDepanAZ = [
+            'Andi','Budi','Citra','Dedi','Eka','Fajar','Gilang','Hani','Indra','Joko',
+            'Kiki','Lina','Maya','Nisa','Oki','Putri','Rudi','Sari','Tono','Umi',
+            'Vina','Wawan','Yudi','Zahra'
+        ];
 
         // Daftar siswa khusus XII RPL 2
         $siswaRPL2 = [
@@ -53,13 +62,16 @@ class SiswaSeeder extends Seeder
             ['nama' => 'Yeni Faturohmah', 'email' => 'yeni@gmail.com'],
         ];
 
-        $dummyCounter = 1; // Untuk email dummy
+        // simpan semua nama yg sudah dipakai supaya tidak duplikat
+        $usedNames = [];
 
         foreach ($kelasList as $kelas) {
-            // Kalau kelas XII RPL 2 pakai daftar asli
             if ($kelas->nama_kelas === 'XII RPL 2') {
                 foreach ($siswaRPL2 as $data) {
                     $nis = $nisStart++;
+
+                    // tambahin ke daftar nama terpakai
+                    $usedNames[] = strtolower($data['nama']);
 
                     $user = User::firstOrCreate(
                         ['email' => $data['email']],
@@ -82,12 +94,19 @@ class SiswaSeeder extends Seeder
                     );
                 }
             } else {
-                // Kelas lain pakai dummy
-                for ($i = 1; $i <= 5; $i++) {
-                    $nama = "Siswa {$dummyCounter}";
-                    $email = "siswa{$dummyCounter}@gmail.com";
+                for ($i = 0; $i < 34; $i++) {
+                    do {
+                        $depan = $namaDepanAZ[$i % count($namaDepanAZ)];
+                        $belakang = $faker->lastName;
+                        $nama = $depan . ' ' . $belakang;
+                    } while (in_array(strtolower($nama), $usedNames));
+
+                    // simpan nama ke daftar terpakai
+                    $usedNames[] = strtolower($nama);
+
+                    $namaPanggilan = strtolower($depan);
+                    $email = $namaPanggilan . $kelas->id . $i . '@gmail.com';
                     $nis = $nisStart++;
-                    $dummyCounter++;
 
                     $user = User::firstOrCreate(
                         ['email' => $email],
