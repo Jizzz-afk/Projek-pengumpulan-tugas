@@ -12,11 +12,11 @@ class SiswaSeeder extends Seeder
 {
     public function run(): void
     {
-        // Cari kelas RPL 2
-        $kelas = Kelas::where('nama_kelas', 'XII RPL 2')->first();
+        $kelasList = Kelas::all();
+        $nisStart = 12329000; // Awal NIS
 
-        // Data siswa (nama + email manual, nis urut)
-        $siswaList = [
+        // Daftar siswa khusus XII RPL 2
+        $siswaRPL2 = [
             ['nama' => 'Adang Nugroho', 'email' => 'adang@gmail.com'],
             ['nama' => 'Ajeng Nurlestari', 'email' => 'ajeng@gmail.com'],
             ['nama' => 'Aji Pangestu', 'email' => 'aji@gmail.com'],
@@ -53,32 +53,63 @@ class SiswaSeeder extends Seeder
             ['nama' => 'Yeni Faturohmah', 'email' => 'yeni@gmail.com'],
         ];
 
-        $nisStart = 12329262;
+        $dummyCounter = 1; // Untuk email dummy
 
-        foreach ($siswaList as $index => $data) {
-            $nis = $nisStart + $index;
+        foreach ($kelasList as $kelas) {
+            // Kalau kelas XII RPL 2 pakai daftar asli
+            if ($kelas->nama_kelas === 'XII RPL 2') {
+                foreach ($siswaRPL2 as $data) {
+                    $nis = $nisStart++;
 
-            // Buat User siswa
-            $user = User::firstOrCreate(
-                ['email' => $data['email']],
-                [
-                    'name' => $data['nama'],
-                    'password' => Hash::make('siswa123'),
-                    'role' => 'siswa',
-                ]
-            );
+                    $user = User::firstOrCreate(
+                        ['email' => $data['email']],
+                        [
+                            'name' => $data['nama'],
+                            'password' => Hash::make('siswa123'),
+                            'role' => 'siswa',
+                        ]
+                    );
 
-            // Buat data Siswa
-            Siswa::firstOrCreate(
-                ['nis' => $nis],
-                [
-                    'user_id' => $user->id,
-                    'nama' => $data['nama'],
-                    'kelas_id' => $kelas->id,
-                    'email' => $data['email'],
-                    'foto' => 'foto/siswa-default.png',
-                ]
-            );
+                    Siswa::firstOrCreate(
+                        ['nis' => $nis],
+                        [
+                            'user_id' => $user->id,
+                            'nama' => $data['nama'],
+                            'kelas_id' => $kelas->id,
+                            'email' => $data['email'],
+                            'foto' => 'foto/siswa-default.png',
+                        ]
+                    );
+                }
+            } else {
+                // Kelas lain pakai dummy
+                for ($i = 1; $i <= 5; $i++) {
+                    $nama = "Siswa {$dummyCounter}";
+                    $email = "siswa{$dummyCounter}@gmail.com";
+                    $nis = $nisStart++;
+                    $dummyCounter++;
+
+                    $user = User::firstOrCreate(
+                        ['email' => $email],
+                        [
+                            'name' => $nama,
+                            'password' => Hash::make('siswa123'),
+                            'role' => 'siswa',
+                        ]
+                    );
+
+                    Siswa::firstOrCreate(
+                        ['nis' => $nis],
+                        [
+                            'user_id' => $user->id,
+                            'nama' => $nama,
+                            'kelas_id' => $kelas->id,
+                            'email' => $email,
+                            'foto' => 'foto/siswa-default.png',
+                        ]
+                    );
+                }
+            }
         }
     }
 }
