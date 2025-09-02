@@ -193,8 +193,14 @@ public function guruUpdate(Request $r, $id)
     public function kelasIndex()
     {
         return view('admin.kelas.index', [
-            'kelas' => Kelas::all()
+            'kelas' => Kelas::withCount('siswa')->get()
         ]);
+    }
+
+    public function kelasDetail($id)
+    {
+        $kelas = Kelas::with(['siswa.user'])->findOrFail($id);
+        return view('admin.kelas.detail', compact('kelas'));
     }
 
     public function kelasStore(Request $r)

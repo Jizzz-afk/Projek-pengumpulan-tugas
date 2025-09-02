@@ -39,42 +39,40 @@
         </div>
     </div>
 
-    <div class="table-responsive shadow-sm rounded-3">
-        <table class="table table-striped align-middle mb-0 bg-white">
-            <thead class="table-primary">
-                <tr>
-                    <th>Nama Kelas</th>
-                    <th>Deskripsi</th>
-                    <th>Wali Kelas</th>
-                    <th class="text-center" style="width: 150px;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($kelas as $k)
-                <tr>
-                    <td>{{ $k->nama_kelas }}</td>
-                    <td>{{ $k->deskripsi }}</td>
-                    <td>{{ $k->wali_kelas }}</td>
-                    <td class="text-center">
-                        <a href="{{ url('/admin/kelas/'.$k->id.'/edit') }}" class="btn btn-sm btn-warning me-1" title="Edit Kelas">
-                            <i class="bi bi-pencil-square"></i> Edit
+    <div class="row">
+        @forelse($kelas as $k)
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm h-100 border-0 rounded-3">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-primary">{{ $k->nama_kelas }}</h5>
+                    <p class="card-text text-muted">{{ $k->deskripsi ?? '-' }}</p>
+                    <p><strong>Jumlah Siswa:</strong> {{ $k->siswa_count }}</p>
+                    <p><strong>Wali Kelas:</strong> {{ $k->wali_kelas }}</p>
+                </div>
+                <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                    <a href="{{ route('admin.kelas.detail', $k->id) }}" class="btn btn-sm btn-info">
+                        <i class="bi bi-info-circle"></i> Detail
+                    </a>
+                    <div>
+                        <a href="{{ url('/admin/kelas/'.$k->id.'/edit') }}" class="btn btn-sm btn-warning me-1">
+                            <i class="bi bi-pencil-square"></i>
                         </a>
                         <form method="POST" action="{{ url('/admin/kelas/'.$k->id) }}" style="display:inline-block" onsubmit="return confirm('Yakin ingin menghapus?')">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-sm btn-danger" title="Hapus Kelas">
-                                <i class="bi bi-trash"></i> Hapus
+                            <button class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i>
                             </button>
                         </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="3" class="text-center text-muted">Belum ada data kelas.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @empty
+        <div class="col-12 text-center text-muted">
+            Belum ada data kelas.
+        </div>
+        @endforelse
     </div>
 </div>
 @endsection
