@@ -65,10 +65,12 @@ class GuruController extends Controller
     {
         $guru = Guru::where('user_id', Auth::id())->first();
         $mapel = Mapel::where('guru_id', $guru->id)->get();
-        $kelas = Kelas::all();
+
+        $kelas = $guru->kelas()->get();
 
         return view('guru.tugas.create', compact('mapel', 'kelas'));
     }
+
 
     public function simpanTugas(Request $request)
     {

@@ -74,6 +74,7 @@
                             <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
                         @endforeach
                     </select>
+
                 </div>
 
                 <div class="mb-3">

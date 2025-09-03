@@ -27,7 +27,8 @@ class DashboardController extends Controller
     public function guruIndex()
     {
         return view('admin.guru.index', [
-            'guru' => Guru::with('user')->get()
+            'guru' => Guru::with(['user','kelas'])->get(),
+            'kelas' => Kelas::all()
         ]);
     }
 
@@ -37,7 +38,8 @@ class DashboardController extends Controller
             'nama' => 'required|string|max:255',
             'nip' => 'required|string|max:50|unique:guru,nip',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'kelas_id' => 'array|max:3', 
         ]);
 
         $user = User::create([
@@ -47,54 +49,64 @@ class DashboardController extends Controller
             'role' => 'guru'
         ]);
 
-        Guru::create([
+        $guru = Guru::create([
             'user_id' => $user->id,
             'nama' => $r->nama,
             'nip' => $r->nip,
             'email' => $r->email
         ]);
 
-        return back()->with('success', 'Guru ditambahkan');
-    }
+        if ($r->kelas_id) {
+            if (count($r->kelas_id) > 3) {
+                return back()->withErrors(['kelas_id' => 'Guru hanya boleh mengajar maksimal 3 kelas.']);
+            }
+            $guru->kelas()->sync($r->kelas_id);
+        }
 
-    public function guruDelete($id)
-    {
-        $guru = Guru::findOrFail($id);
-        $guru->user->delete();
-        $guru->delete();
-        return back()->with('success', 'Guru dihapus');
+        return back()->with('success', 'Guru ditambahkan');
     }
 
     public function guruEdit($id)
     {
         return view('admin.guru.edit', [
-            'guru' => Guru::with('user')->findOrFail($id)
-    ]);
+            'guru' => Guru::with('kelas','user')->findOrFail($id),
+            'kelas' => Kelas::all()
+        ]);
     }
 
-public function guruUpdate(Request $r, $id)
+    public function guruUpdate(Request $r, $id)
     {
         $guru = Guru::findOrFail($id);
+
         $r->validate([
             'nama' => 'required|string|max:255',
             'nip' => 'required|string|max:50|unique:guru,nip,' . $id,
             'email' => 'required|email|unique:users,email,' . $guru->user_id,
+            'kelas_id' => 'array|max:3',
         ]);
 
         $guru->update([
             'nama' => $r->nama,
             'nip' => $r->nip,
             'email' => $r->email,
-            'foto' => $r->foto,
         ]);
         $guru->user->update([
             'name' => $r->nama,
             'email' => $r->email,
-            'foto' => $r->foto,
         ]);
-        return redirect()->route('admin.guru.index')->with('success', 'Guru diperbarui');
 
+        if ($r->kelas_id) {
+            if (count($r->kelas_id) > 3) {
+                return back()->withErrors(['kelas_id' => 'Guru hanya boleh mengajar maksimal 3 kelas.']);
+            }
+            $guru->kelas()->sync($r->kelas_id);
+        } else {
+            $guru->kelas()->detach(); 
+        }
+
+        return redirect()->route('admin.guru.index')->with('success', 'Guru diperbarui');
     }
+
 
     // ======================= SISWA =======================
     public function siswaIndex()
