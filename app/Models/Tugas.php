@@ -7,16 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Tugas extends Model
 {
     protected $table = 'tugas';
-    protected $fillable = ['guru_id','mapel_id', 'kelas_id', 'judul', 'foto_tugas', 'deskripsi', 'file', 'deadline'];
+    protected $fillable = [
+        'jadwal_id',
+        'judul',
+        'deskripsi',
+        'foto_tugas',
+        'file',
+        'deadline'
+    ];
 
-    public function kelas()
+    public function jadwal()
     {
-        return $this->belongsTo(Kelas::class);
-    }
-
-    public function mapel()
-    {
-        return $this->belongsTo(Mapel::class);
+        return $this->belongsTo(Jadwal::class);
     }
 
     public function pengumpulan()

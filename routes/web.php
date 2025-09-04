@@ -39,10 +39,10 @@ Route::middleware(['auth', CekRole::class . ':admin' ])->prefix('admin')->group(
     Route::get('/kelas/{id}/detail', [DashboardController::class, 'kelasDetail'])->name('admin.kelas.detail');
 
     Route::get('/mapel', [DashboardController::class, 'mapelIndex'])->name('admin.mapel.index');
-    Route::post('/mapel', [DashboardController::class, 'mapelStore']);
+    Route::post('/mapel', [DashboardController::class, 'mapelStore'])->name('admin.mapel.store');
     Route::get('/mapel/{id}/edit', [DashboardController::class, 'mapelEdit'])->name('admin.mapel.edit');
     Route::put('/mapel/{id}', [DashboardController::class, 'mapelUpdate'])->name('admin.mapel.update');
-    Route::delete('/mapel/{id}', [DashboardController::class, 'mapelDelete']);
+    Route::delete('/mapel/{id}', [DashboardController::class, 'mapelDelete'])->name('admin.mapel.destroy');
 
     Route::get('/user', [DashboardController::class, 'userIndex'])->name('admin.users.index');
     Route::post('/user/{id}/role', [DashboardController::class, 'updateRole'])->name('admin.users.updateRole');

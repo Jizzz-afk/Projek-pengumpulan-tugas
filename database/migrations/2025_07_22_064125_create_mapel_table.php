@@ -10,10 +10,8 @@ class CreateMapelTable extends Migration
         Schema::create('mapel', function (Blueprint $table) {
             $table->id();
             $table->string('nama_mapel');
-            $table->unsignedBigInteger('guru_id')->nullable(); 
             $table->timestamps();
-
-            $table->foreign('guru_id')->references('id')->on('guru')->onDelete('set null');
+            
         });
     }
 

@@ -9,6 +9,7 @@ use App\Models\User;
 class Guru extends Model
 {
     use HasFactory;
+
     protected $table = 'guru';
     protected $fillable = ['user_id', 'nama', 'nip', 'email'];
 
@@ -16,18 +17,21 @@ class Guru extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function mapel()
     {
-        return $this->hasMany(Mapel::class, 'guru_id');
+        return $this->belongsTo(Mapel::class, 'mapel_id');
     }
+
 
     public function kelasYangDibina()
     {
         return $this->hasMany(Kelas::class, 'wali_kelas_id');
     }
-    public function kelas()
-    {
-        return $this->belongsToMany(Kelas::class, 'guru_kelas');
-    }
 
+    public function jadwal()
+    {
+        return $this->hasMany(Jadwal::class);
+    }
+    
 }

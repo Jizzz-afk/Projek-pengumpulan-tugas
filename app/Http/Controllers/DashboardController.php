@@ -8,6 +8,8 @@ use App\Models\Guru;
 use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\Mapel;
+use App\Models\Jadwal;
+use App\Models\Tugas;
 use Illuminate\Support\Facades\Hash;
 
 class DashboardController extends Controller
@@ -19,27 +21,30 @@ class DashboardController extends Controller
             'jumlahGuru' => Guru::count(),
             'jumlahSiswa' => Siswa::count(),
             'jumlahKelas' => Kelas::count(),
-            'jumlahMapel' => Mapel::count()
+            'jumlahMapel' => Mapel::count(),
+            'jumlahJadwal' => Jadwal::count(),
+            'jumlahTugas' => Tugas::count(),
         ]);
     }
 
     // ======================= GURU =======================
-    public function guruIndex()
+ public function guruIndex()
     {
         return view('admin.guru.index', [
-            'guru' => Guru::with(['user','kelas'])->get(),
-            'kelas' => Kelas::all()
+            'guru'  => Guru::with(['user','mapel','jadwal.kelas'])->get(),
+            'kelas' => Kelas::all(),
+            'mapel' => Mapel::all()
         ]);
     }
 
     public function guruStore(Request $r)
     {
         $r->validate([
-            'nama' => 'required|string|max:255',
-            'nip' => 'required|string|max:50|unique:guru,nip',
+            'nama' => 'required',
+            'nip' => 'required|unique:guru,nip',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'kelas_id' => 'array|max:3', 
+            'mapel_id' => 'required|exists:mapel,id'
         ]);
 
         $user = User::create([
@@ -53,24 +58,30 @@ class DashboardController extends Controller
             'user_id' => $user->id,
             'nama' => $r->nama,
             'nip' => $r->nip,
-            'email' => $r->email
+            'email' => $r->email,
+            'mapel_id' => $r->mapel_id
         ]);
 
         if ($r->kelas_id) {
-            if (count($r->kelas_id) > 3) {
-                return back()->withErrors(['kelas_id' => 'Guru hanya boleh mengajar maksimal 3 kelas.']);
+            $kelasDipilih = array_slice($r->kelas_id, 0, 3);
+            foreach ($kelasDipilih as $kelasId) {
+                Jadwal::create([
+                    'guru_id' => $guru->id,
+                    'kelas_id' => $kelasId,
+                    'mapel_id' => $r->mapel_id,
+                ]);
             }
-            $guru->kelas()->sync($r->kelas_id);
         }
 
-        return back()->with('success', 'Guru ditambahkan');
+        return back()->with('success', 'Guru berhasil ditambahkan');
     }
 
     public function guruEdit($id)
     {
         return view('admin.guru.edit', [
-            'guru' => Guru::with('kelas','user')->findOrFail($id),
-            'kelas' => Kelas::all()
+            'guru' => Guru::findOrFail($id),
+            'kelas' => Kelas::all(),
+            'mapel' => Mapel::all()
         ]);
     }
 
@@ -81,32 +92,41 @@ class DashboardController extends Controller
         $r->validate([
             'nama' => 'required|string|max:255',
             'nip' => 'required|string|max:50|unique:guru,nip,' . $id,
-            'email' => 'required|email|unique:users,email,' . $guru->user_id,
-            'kelas_id' => 'array|max:3',
+            'email' => 'required|email|unique:guru,email,' . $id,
+            'mapel_id' => 'required'
         ]);
 
         $guru->update([
             'nama' => $r->nama,
             'nip' => $r->nip,
             'email' => $r->email,
-        ]);
-        $guru->user->update([
-            'name' => $r->nama,
-            'email' => $r->email,
+            'mapel_id' => $r->mapel_id
         ]);
 
+        // update kelas via tabel jadwal
         if ($r->kelas_id) {
-            if (count($r->kelas_id) > 3) {
-                return back()->withErrors(['kelas_id' => 'Guru hanya boleh mengajar maksimal 3 kelas.']);
+            Jadwal::where('guru_id', $guru->id)->delete(); // hapus lama
+            $kelasDipilih = array_slice($r->kelas_id, 0, 3);
+            foreach ($kelasDipilih as $kelasId) {
+                Jadwal::create([
+                    'guru_id' => $guru->id,
+                    'kelas_id' => $kelasId,
+                    'mapel_id' => $r->mapel_id,
+                ]);
             }
-            $guru->kelas()->sync($r->kelas_id);
-        } else {
-            $guru->kelas()->detach(); 
         }
 
         return redirect()->route('admin.guru.index')->with('success', 'Guru diperbarui');
     }
 
+
+    public function guruDelete($id)
+    {
+        $guru = Guru::findOrFail($id);
+        $guru->user->delete();
+        $guru->delete();
+        return back()->with('success', 'Guru dihapus');
+    }
 
     // ======================= SISWA =======================
     public function siswaIndex()
@@ -126,9 +146,6 @@ class DashboardController extends Controller
             'kelas_id' => 'required|exists:kelas,id',
             'password' => 'required|min:6',
             'foto' => 'nullable|image|max:2048'
-        ], [
-            'nis.unique' => 'NIS ini sudah terdaftar.',
-            'email.unique' => 'Email ini sudah digunakan.',
         ]);
 
         $path = null;
@@ -156,14 +173,6 @@ class DashboardController extends Controller
 
         return back()->with('success', 'Siswa ditambahkan');
     }
-
-        public function siswaDelete($id)
-        {
-            $siswa = Siswa::findOrFail($id);
-            $siswa->user->delete();
-            $siswa->delete();
-            return back()->with('success', 'Siswa dihapus');
-        }
 
     public function siswaEdit($id)
     {
@@ -199,7 +208,13 @@ class DashboardController extends Controller
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa diperbarui');
     }
 
-
+    public function siswaDelete($id)
+    {
+        $siswa = Siswa::findOrFail($id);
+        $siswa->user->delete();
+        $siswa->delete();
+        return back()->with('success', 'Siswa dihapus');
+    }
 
     // ======================= KELAS =======================
     public function kelasIndex()
@@ -209,34 +224,22 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function kelasDetail($id)
-    {
-        $kelas = Kelas::with(['siswa.user'])->findOrFail($id);
-        return view('admin.kelas.detail', compact('kelas'));
-    }
-
     public function kelasStore(Request $r)
     {
         $r->validate([
             'nama_kelas' => 'required|unique:kelas,nama_kelas',
-            'wali_kelas' => 'required|string',
+            'wali_kelas' => 'nullable|string',
             'deskripsi'  => 'nullable|string',
         ]);
 
-        Kelas::create([
-            'nama_kelas' => $r->nama_kelas,
-            'wali_kelas' => $r->wali_kelas,
-            'deskripsi'  => $r->deskripsi,
-        ]);
-
+        Kelas::create($r->all());
         return back()->with('success', 'Kelas ditambahkan');
     }
 
     public function kelasEdit($id)
     {
         return view('admin.kelas.edit', [
-            'kelas' => Kelas::findOrFail($id),
-            'daftarWaliK' => Kelas::select('wali_kelas')->distinct()->get()
+            'kelas' => Kelas::findOrFail($id)
         ]);
     }
 
@@ -244,17 +247,11 @@ class DashboardController extends Controller
     {
         $r->validate([
             'nama_kelas' => 'required|unique:kelas,nama_kelas,'.$id,
-            'wali_kelas' => 'required|string',
+            'wali_kelas' => 'nullable|string',
             'deskripsi'  => 'nullable|string',
         ]);
 
-        $kelas = Kelas::findOrFail($id);
-        $kelas->update([
-            'nama_kelas' => $r->nama_kelas,
-            'wali_kelas' => $r->wali_kelas,
-            'deskripsi'  => $r->deskripsi,
-        ]);
-
+        Kelas::findOrFail($id)->update($r->all());
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas diperbarui');
     }
 
@@ -264,15 +261,11 @@ class DashboardController extends Controller
         return back()->with('success', 'Kelas dihapus');
     }
 
-
     // ======================= MAPEL =======================
     public function mapelIndex()
     {
-        $guruDipakai = Mapel::pluck('guru_id')->toArray();
-
         return view('admin.mapel.index', [
-            'mapel' => Mapel::with('guru')->get(),
-            'guru' => Guru::whereNotIn('id', $guruDipakai)->get()
+            'mapel' => Mapel::all()
         ]);
     }
 
@@ -280,12 +273,8 @@ class DashboardController extends Controller
     {
         $r->validate([
             'nama_mapel' => 'required|unique:mapel,nama_mapel',
-            'guru_id' => 'required|exists:guru,id',
         ]);
-        Mapel::create([
-            'nama_mapel' => $r->nama_mapel,
-            'guru_id' => $r->guru_id
-        ]);
+        Mapel::create($r->all());
         return back()->with('success', 'Mapel ditambahkan');
     }
 
@@ -293,14 +282,8 @@ class DashboardController extends Controller
     {
         $r->validate([
             'nama_mapel' => 'required|unique:mapel,nama_mapel,' . $id,
-            'guru_id' => 'required|exists:guru,id',
         ]);
-
-        $mapel = Mapel::findOrFail($id);
-        $mapel->update([
-            'nama_mapel' => $r->nama_mapel,
-            'guru_id' => $r->guru_id
-        ]);
+        Mapel::findOrFail($id)->update($r->all());
         return redirect()->route('admin.mapel.index')->with('success', 'Mapel diperbarui');
     }
 
@@ -310,15 +293,42 @@ class DashboardController extends Controller
         return back()->with('success', 'Mapel dihapus');
     }
 
-    public function mapelEdit($id)
+    // ======================= JADWAL =======================
+    public function jadwalIndex()
     {
-        $mapel = Mapel::findOrFail($id);
-
-        $guruDipakai = Mapel::where('id', '!=', $id)->pluck('guru_id')->toArray();
-
-        return view('admin.mapel.edit', [
-            'mapel' => $mapel,
-            'guru' => Guru::whereNotIn('id', $guruDipakai)->orWhere('id', $mapel->guru_id)->get()
+        return view('admin.jadwal.index', [
+            'jadwal' => Jadwal::with(['guru','mapel','kelas'])->get(),
+            'guru' => Guru::all(),
+            'mapel' => Mapel::all(),
+            'kelas' => Kelas::all(),
         ]);
+    }
+
+    public function jadwalStore(Request $r)
+    {
+        $r->validate([
+            'guru_id' => 'required|exists:guru,id',
+            'mapel_id' => 'required|exists:mapel,id',
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
+        Jadwal::create($r->all());
+        return back()->with('success', 'Jadwal ditambahkan');
+    }
+
+    public function jadwalUpdate(Request $r, $id)
+    {
+        $r->validate([
+            'guru_id' => 'required|exists:guru,id',
+            'mapel_id' => 'required|exists:mapel,id',
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
+        Jadwal::findOrFail($id)->update($r->all());
+        return redirect()->route('admin.jadwal.index')->with('success', 'Jadwal diperbarui');
+    }
+
+    public function jadwalDelete($id)
+    {
+        Jadwal::destroy($id);
+        return back()->with('success', 'Jadwal dihapus');
     }
 }
