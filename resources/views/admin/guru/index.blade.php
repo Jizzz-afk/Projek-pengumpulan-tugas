@@ -30,18 +30,31 @@
                 </div>
 
                 {{-- Pilih Kelas --}}
-                <div class="col-md-2">
-                    <label for="kelas_id" class="form-label fw-semibold">Kelas (maks. 3)</label>
-                    <select name="kelas_id[]" id="kelas_id" class="form-select" multiple size="5">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Pilih Kelas (maks. 3)</label>
+                    <div class="row">
                         @foreach($kelas as $k)
-                            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input 
+                                        type="checkbox" 
+                                        class="form-check-input" 
+                                        id="kelas_{{ $k->id }}" 
+                                        name="kelas_id[]" 
+                                        value="{{ $k->id }}"
+                                    >
+                                    <label for="kelas_{{ $k->id }}" class="form-check-label">
+                                        {{ $k->nama_kelas }}
+                                    </label>
+                                </div>
+                            </div>
                         @endforeach
-                    </select>
-                    <small class="text-muted">Tahan CTRL untuk memilih lebih dari satu.</small>
+                    </div>
+                    <small class="text-muted">Pilih maksimal 3 kelas.</small>
                 </div>
 
                 {{-- Pilih Mapel --}}
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label for="mapel_id" class="form-label fw-semibold">Mata Pelajaran</label>
                     <select name="mapel_id" id="mapel_id" class="form-select" required>
                         <option value="">-- Pilih Mapel --</option>
