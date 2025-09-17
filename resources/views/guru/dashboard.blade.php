@@ -36,16 +36,6 @@
 <div class="container py-4">
     <h3 class="mb-4 fw-bold title-gradient">📊 Dashboard Guru</h3>
 
-    {{-- Info Wali Kelas --}}
-    @if ($kelasYangDibina->count() > 0)
-        <div class="alert alert-primary shadow-sm rounded-pill px-4 mb-4">
-            <strong>🧑‍🏫 Anda adalah wali kelas:</strong> 
-            @foreach ($kelasYangDibina as $kelas)
-                <span class="badge bg-primary">{{ $kelas->nama_kelas }}</span>
-            @endforeach
-        </div>
-    @endif
-
     {{-- Statistik Utama --}}
     <div class="row g-3 mb-4">
         <div class="col-md-3 col-sm-6">

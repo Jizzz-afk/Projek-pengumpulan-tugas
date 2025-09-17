@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->foreignId('jadwal_id')->constrained('jadwal')->onDelete('cascade'); 
             $table->string('judul');
             $table->text('deskripsi')->nullable();
-            $table->string('foto_tugas');
+            $table->string('foto_tugas')->nullable();
             $table->date('deadline');
             $table->timestamps();
 

@@ -11,16 +11,33 @@ use Illuminate\Support\Facades\Auth;
 
 class GuruController extends Controller
 {
-    // Dashboard
-    public function dashboard()
-    {
-        $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+// Dashboard
+public function dashboard()
+{
+    $guru = Guru::where('user_id', Auth::id())->firstOrFail();
 
-        $jumlahJadwal = Jadwal::where('guru_id', $guru->id)->count();
-        $jumlahTugas = Tugas::whereHas('jadwal', fn($q) => $q->where('guru_id',$guru->id))->count();
+    $jumlahJadwal = Jadwal::where('guru_id', $guru->id)->count();
 
-        return view('guru.dashboard', compact('guru','jumlahJadwal','jumlahTugas'));
+    $jumlahTugas = Tugas::whereHas('jadwal', fn($q) => $q->where('guru_id', $guru->id))->count();
+
+    $tugasTerakhir = Tugas::whereHas('jadwal', fn($q) => $q->where('guru_id', $guru->id))
+        ->latest()
+        ->first();
+
+    $jumlahMapel = Jadwal::where('guru_id', $guru->id)->with('mapel')->get()->pluck('mapel.id')->unique()->count();
+
+    $totalSiswa = Pengumpulan::whereHas('tugas.jadwal', fn($q) => $q->where('guru_id', $guru->id))->distinct('siswa_id')->count('siswa_id');
+
+    $jumlahSiswaPerKelas = Pengumpulan::whereHas('tugas.jadwal', fn($q) => $q->where('guru_id', $guru->id))->with('siswa.kelas')->get()->groupBy(fn($p) => $p->siswa->kelas->nama ?? 'Tanpa Kelas')->map(fn($g) => $g->pluck('siswa_id')->unique()->count());
+
+    $totalSiswaPerKelas = [];
+    foreach ($jumlahSiswaPerKelas as $kelas => $jumlah) {
+        $totalSiswaPerKelas[$kelas] = \App\Models\Siswa::whereHas('kelas', fn($q) => $q->where('nama', $kelas))->count();
     }
+
+    return view('guru.dashboard', compact('guru','jumlahJadwal','jumlahTugas','tugasTerakhir','jumlahMapel','totalSiswa','jumlahSiswaPerKelas','totalSiswaPerKelas'
+    ));
+}
 
     // Profil
     public function profil()
@@ -29,7 +46,7 @@ class GuruController extends Controller
         return view('guru.profil', compact('guru'));
     }
 
-    // ==================== CRUD TUGAS ====================
+    // ==================== TUGAS ====================
     public function tugas()
     {
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
@@ -46,28 +63,31 @@ class GuruController extends Controller
         return view('guru.tugas.create', compact('jadwal'));
     }
 
-    public function simpanTugas(Request $r)
+        public function simpanTugas(Request $r)
     {
         $r->validate([
             'jadwal_id' => 'required|exists:jadwal,id',
             'judul' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'deadline' => 'required|date',
-            'file' => 'nullable|file|max:2048'
+            'foto_tugas' => 'nullable|file|max:2048'
         ]);
 
-        $path = $r->hasFile('file') ? $r->file('file')->store('tugas','public') : null;
+        $path = $r->hasFile('foto_tugas')
+            ? $r->file('foto_tugas')->store('tugas', 'public')
+            : null;
 
         Tugas::create([
-            'jadwal_id'=>$r->jadwal_id,
-            'judul'=>$r->judul,
-            'deskripsi'=>$r->deskripsi,
-            'deadline'=>$r->deadline,
-            'file'=>$path
+            'jadwal_id' => $r->jadwal_id,
+            'judul'     => $r->judul,
+            'deskripsi' => $r->deskripsi,
+            'deadline'  => $r->deadline,
+            'foto_tugas'=> $path
         ]);
 
         return redirect()->route('guru.tugas')->with('success','Tugas dibuat');
     }
+
 
     public function editTugas($id)
     {
@@ -92,21 +112,22 @@ class GuruController extends Controller
             'judul' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'deadline' => 'required|date',
-            'file' => 'nullable|file|max:2048'
+            'foto_tugas' => 'nullable|file|max:2048'
         ]);
 
-        $path = $tugas->file;
-        if ($r->hasFile('file')) {
-            $path = $r->file('file')->store('tugas','public');
+        $path = $tugas->foto_tugas;
+        if ($r->hasFile('foto_tugas')) {
+            $path = $r->file('foto_tugas')->store('tugas','public');
         }
 
         $tugas->update([
-            'jadwal_id'=>$r->jadwal_id,
-            'judul'=>$r->judul,
-            'deskripsi'=>$r->deskripsi,
-            'deadline'=>$r->deadline,
-            'file'=>$path
+            'jadwal_id' => $r->jadwal_id,
+            'judul'     => $r->judul,
+            'deskripsi' => $r->deskripsi,
+            'deadline'  => $r->deadline,
+            'foto_tugas'=> $path
         ]);
+
 
         return redirect()->route('guru.tugas')->with('success','Tugas diperbarui');
     }
