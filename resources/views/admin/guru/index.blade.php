@@ -106,8 +106,10 @@
                             @endif
                         </td>
                         <td>
-                            @if($g->mapel)
-                                <span class="badge bg-success">{{ $g->mapel->nama_mapel }}</span>
+                            @if($g->mapel->count())
+                                @foreach($g->mapel as $m)
+                                    <span class="badge bg-success">{{ $m->nama_mapel }}</span>
+                                @endforeach
                             @else
                                 <span class="text-muted">-</span>
                             @endif
