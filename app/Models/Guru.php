@@ -20,7 +20,7 @@ class Guru extends Model
 
     public function mapel()
     {
-        return $this->belongsTo(Mapel::class, 'mapel_id');
+        return $this->belongsToMany(Mapel::class, 'jadwal', 'guru_id', 'mapel_id')->distinct();
     }
 
 

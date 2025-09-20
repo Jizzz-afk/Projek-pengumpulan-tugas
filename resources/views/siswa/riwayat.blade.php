@@ -52,7 +52,7 @@
                                 <td>
                                     <div class="fw-semibold text-dark">{{ $r->tugas->judul ?? '-' }}</div>
                                     <small class="text-muted">
-                                        {{ $r->tugas->mapel->nama ?? 'Tidak ada mata pelajaran' }}
+                                        {{ $r->tugas->mapel->nama_mapel ?? 'Tidak ada mata pelajaran' }}
                                     </small>
                                 </td>
                                 <td class="text-center">

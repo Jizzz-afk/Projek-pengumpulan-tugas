@@ -21,6 +21,11 @@ class Tugas extends Model
         return $this->belongsTo(Jadwal::class);
     }
 
+    public function mapel()
+    {
+        return $this->hasOneThrough(Mapel::class, Jadwal::class, 'id', 'id', 'jadwal_id', 'mapel_id');
+    }
+
     public function pengumpulan()
     {
         return $this->hasMany(Pengumpulan::class);

@@ -86,34 +86,5 @@
             </div>
         </div>
     </div>
-
-    {{-- Siswa Mengumpulkan per Kelas --}}
-    @if (count($jumlahSiswaPerKelas))
-        <h5 class="mt-5 fw-semibold mb-3">👥 Siswa Mengumpulkan per Kelas</h5>
-        <div class="row g-3">
-            @foreach ($jumlahSiswaPerKelas as $kelas => $jumlah)
-                @php
-                    $totalSiswaKelas = $totalSiswaPerKelas[$kelas] ?? 1; // total siswa di kelas
-                    $progress = round(($jumlah / $totalSiswaKelas) * 100);
-                @endphp
-                <div class="col-md-3 col-sm-6">
-                    <div class="card border-0 shadow-sm h-100 card-hover">
-                        <div class="card-body text-center">
-                            <i class="bi bi-person-lines-fill fs-3 text-primary mb-2"></i>
-                            <h6 class="fw-bold">{{ $kelas }}</h6>
-                            <span class="badge bg-light text-dark px-3 py-2 shadow-sm mb-2">
-                                {{ $jumlah }} siswa
-                            </span>
-                            <div class="progress">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $progress }}%">
-                                    {{ $progress }}%
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    @endif
 </div>
 @endsection

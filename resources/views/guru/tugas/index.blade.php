@@ -15,6 +15,7 @@
                 <tr>
                     <th>Judul</th>
                     <th>Foto</th>
+                    <th>Deskripsi</th>
                     <th>Mapel</th>
                     <th>Kelas</th>
                     <th>Deadline</th>
@@ -48,6 +49,8 @@
                 @endif
             </td>
             
+            <td>{{ $item->deskripsi}}</td>
+
             {{-- ambil dari relasi jadwal --}}
             <td>{{ $item->jadwal->mapel->nama_mapel ?? '-' }}</td>
             <td>{{ $item->jadwal->kelas->nama_kelas ?? '-' }}</td>

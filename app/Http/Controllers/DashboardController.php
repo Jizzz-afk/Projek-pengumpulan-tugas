@@ -30,11 +30,11 @@ class DashboardController extends Controller
     // ======================= GURU =======================
  public function guruIndex()
     {
-        return view('admin.guru.index', [
-            'guru'  => Guru::with(['user','mapel','jadwal.kelas'])->get(),
-            'kelas' => Kelas::all(),
-            'mapel' => Mapel::all()
-        ]);
+        $guru  = Guru::with(['user','mapel','jadwal.kelas'])->get();
+        $kelas = Kelas::all();
+        $mapel = Mapel::all();
+
+        return view('admin.guru.index', compact('guru', 'kelas', 'mapel'));
     }
 
     public function guruStore(Request $r)
@@ -43,8 +43,7 @@ class DashboardController extends Controller
             'nama' => 'required',
             'nip' => 'required|unique:guru,nip',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'mapel_id' => 'required|exists:mapel,id'
+            'password' => 'required|min:6'
         ]);
 
         $user = User::create([
@@ -58,20 +57,18 @@ class DashboardController extends Controller
             'user_id' => $user->id,
             'nama' => $r->nama,
             'nip' => $r->nip,
-            'email' => $r->email,
-            'mapel_id' => $r->mapel_id
+            'email' => $r->email
         ]);
 
         if ($r->kelas_id) {
-            $kelasDipilih = array_slice($r->kelas_id, 0, 3);
-            foreach ($kelasDipilih as $kelasId) {
-                Jadwal::create([
-                    'guru_id' => $guru->id,
-                    'kelas_id' => $kelasId,
-                    'mapel_id' => $r->mapel_id,
-                ]);
-            }
+        foreach ($r->kelas_id as $kelasId) {
+            Jadwal::create([
+                'guru_id'  => $guru->id,
+                'kelas_id' => $kelasId,
+                'mapel_id' => $r->mapel_id,
+            ]);
         }
+    }
 
         return back()->with('success', 'Guru berhasil ditambahkan');
     }
@@ -103,10 +100,9 @@ class DashboardController extends Controller
             'mapel_id' => $r->mapel_id
         ]);
 
-        // update kelas via tabel jadwal
         if ($r->kelas_id) {
-            Jadwal::where('guru_id', $guru->id)->delete(); // hapus lama
-            $kelasDipilih = array_slice($r->kelas_id, 0, 3);
+            Jadwal::where('guru_id', $guru->id)->delete(); 
+            $kelasDipilih = array_slice($r->kelas_id, 0, 10);
             foreach ($kelasDipilih as $kelasId) {
                 Jadwal::create([
                     'guru_id' => $guru->id,
@@ -115,7 +111,6 @@ class DashboardController extends Controller
                 ]);
             }
         }
-
         return redirect()->route('admin.guru.index')->with('success', 'Guru diperbarui');
     }
 
