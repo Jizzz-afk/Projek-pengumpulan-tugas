@@ -12,7 +12,6 @@ class Tugas extends Model
         'judul',
         'deskripsi',
         'foto_tugas',
-        'file',
         'deadline'
     ];
 

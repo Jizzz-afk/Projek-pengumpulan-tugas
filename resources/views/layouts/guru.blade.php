@@ -16,7 +16,8 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    @auth
+    @if (Auth::user()->role === 'guru')
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="{{ route('guru.dashboard') }}">
@@ -49,8 +50,6 @@
                         </a>
                     </li>
                 </ul>
-
-                <!-- Dropdown User -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -77,8 +76,8 @@
             </div>
         </div>
     </nav>
-
-    <!-- Konten -->
+@endif
+@endauth
     <div class="container my-4">
         @yield('content')
     </div>

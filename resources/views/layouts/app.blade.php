@@ -5,7 +5,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     @auth
-@if (Auth::user()->role === 'admin' || Auth::user()->role === 'guru')
+@if (Auth::user()->role === 'admin')
 <style>
     body {
         min-height: 100vh;
@@ -82,22 +82,6 @@
 @endif
 @endauth
 
-@auth
-@if (Auth::user()->role === 'guru')
-<title>Guru Dashboard</title>
-<div class="sidebar">
-    <h4>Guru Panel</h4>
-    <a href="{{ route('guru.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-    <a href="{{ route('guru.tugas') }}"><i class="bi bi-file-earmark-text"></i> Manajemen Tugas</a>
-    <a href="{{ route('guru.penilaian') }}"><i class="bi bi-check2-square"></i> Penilaian Tugas</a>
-    <a href="{{ route('guru.profil') }}"><i class="bi bi-person-circle"></i> Profil</a>
-    <form action="{{ route('logout') }}" method="POST" class="mt-auto">
-        @csrf
-        <button type="submit" class="logout-btn"><i class="bi bi-box-arrow-right"></i> Logout</button>
-    </form>
-</div>
-@endif
-@endauth
 
 @auth
 @if (Auth::user()->role === 'siswa')

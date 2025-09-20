@@ -5,16 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\Tugas;
+use App\Models\Mapel;
 use App\Models\Jadwal;
 use App\Models\Pengumpulan;
 use App\Models\Siswa; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 
 class GuruController extends Controller
 {
-// Dashboard
 public function dashboard()
 {
     $guru = Guru::where('user_id', Auth::id())->firstOrFail();
@@ -62,9 +64,13 @@ public function dashboard()
     public function buatTugas()
     {
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
-        $jadwal = Jadwal::where('guru_id',$guru->id)->with('mapel','kelas')->get();
-        return view('guru.tugas.create', compact('jadwal'));
+        $jadwal = Jadwal::where('guru_id', $guru->id)->with('mapel','kelas')->get();
+        $mapel = Mapel::all();
+        $kelas = Kelas::all();
+
+        return view('guru.tugas.create', compact('jadwal','mapel','kelas'));
     }
+
 
         public function simpanTugas(Request $r)
     {
@@ -91,7 +97,6 @@ public function dashboard()
         return redirect()->route('guru.tugas')->with('success','Tugas dibuat');
     }
 
-
     public function editTugas($id)
     {
         $tugas = Tugas::findOrFail($id);
@@ -99,41 +104,49 @@ public function dashboard()
 
         if ($tugas->jadwal->guru_id !== $guru->id) abort(403);
 
-        $jadwal = Jadwal::where('guru_id',$guru->id)->with('mapel','kelas')->get();
+        $jadwal = Jadwal::where('guru_id', $guru->id)->with('mapel','kelas')->get();
+
         return view('guru.tugas.edit', compact('tugas','jadwal'));
     }
 
-    public function updateTugas(Request $r, $id)
-    {
-        $tugas = Tugas::findOrFail($id);
-        $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+   public function updateTugas(Request $r, $id)
+{
+    
+    $tugas = Tugas::findOrFail($id);
+    $guru = Guru::where('user_id', Auth::id())->firstOrFail();
 
-        if ($tugas->jadwal->guru_id !== $guru->id) abort(403);
-
-        $r->validate([
-            'jadwal_id' => 'required|exists:jadwal,id',
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'deadline' => 'required|date',
-            'foto_tugas' => 'nullable|file|max:2048'
-        ]);
-
-        $path = $tugas->foto_tugas;
-        if ($r->hasFile('foto_tugas')) {
-            $path = $r->file('foto_tugas')->store('tugas','public');
-        }
-
-        $tugas->update([
-            'jadwal_id' => $r->jadwal_id,
-            'judul'     => $r->judul,
-            'deskripsi' => $r->deskripsi,
-            'deadline'  => $r->deadline,
-            'foto_tugas'=> $path
-        ]);
-
-
-        return redirect()->route('guru.tugas')->with('success','Tugas diperbarui');
+    if ($tugas->jadwal->guru_id !== $guru->id) {
+        abort(403);
     }
+
+    $r->validate([
+        'jadwal_id'   => 'required|exists:jadwal,id',
+        'judul'       => 'required|string|max:255',
+        'deskripsi'   => 'nullable|string',
+        'deadline'    => 'required|date',
+        'foto_tugas'  => 'nullable|file|max:2048',
+    ]);
+
+    // handle file
+    $path = $tugas->foto_tugas;
+    if ($r->hasFile('foto_tugas')) {
+        if ($tugas->foto_tugas && Storage::disk('public')->exists($tugas->foto_tugas)) {
+            Storage::disk('public')->delete($tugas->foto_tugas);
+        }
+        $path = $r->file('foto_tugas')->store('tugas', 'public');
+    }
+
+    // update data
+    $tugas->update([
+        'jadwal_id'   => $r->jadwal_id,
+        'judul'       => $r->judul,
+        'deskripsi'   => $r->deskripsi,
+        'deadline'    => $r->deadline, 
+        'foto_tugas'  => $path,
+    ]);
+
+    return redirect()->route('guru.tugas')->with('success', 'Tugas berhasil diperbarui');
+}
 
     public function hapusTugas($id)
     {

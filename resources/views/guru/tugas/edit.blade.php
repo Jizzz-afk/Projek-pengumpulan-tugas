@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.guru')
 
 @section('content')
 <div class="container">
@@ -9,12 +9,18 @@
         <div class="card-body">
 
             {{-- Notifikasi Error --}}
-            @if(session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
             {{-- Form Edit --}}
-            <form method="POST" action="{{ route('guru.tugas.update', $tugas->id) }}">
+            <form action="{{ route('guru.tugas.update', $tugas->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -32,6 +38,23 @@
                     <textarea name="deskripsi" id="deskripsi" 
                         class="form-control" rows="4">{{ old('deskripsi', $tugas->deskripsi) }}</textarea>
                 </div>
+                
+                {{-- File Tugas --}}
+                <div class="mb-3">
+                    <label for="foto_tugas" class="form-label fw-semibold">File Tugas</label>
+                    {{-- Preview File Lama --}}
+                    @if($tugas->foto_tugas)
+                        <p class="mb-2">
+                            File saat ini: 
+                            <a href="{{ asset('storage/'.$tugas->foto_tugas) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Lihat File
+                            </a>
+                        </p>
+                    @endif
+                    <input type="file" name="foto_tugas" id="foto_tugas" class="form-control"
+                        accept=".jpg,.png,.pdf,.docx,.zip,.rar">
+                    <small class="text-muted">Kosongkan jika tidak ingin mengganti file.</small>
+                </div>
 
                 {{-- Deadline --}}
                 <div class="mb-3">
@@ -43,25 +66,12 @@
 
                 {{-- Mata Pelajaran --}}
                 <div class="mb-3">
-                    <label for="mapel_id" class="form-label fw-semibold">Mata Pelajaran</label>
-                    <select name="mapel_id" id="mapel_id" class="form-select" required>
-                        <option value="">-- Pilih Mapel --</option>
-                        @foreach($mapel as $m)
-                            <option value="{{ $m->id }}" {{ $tugas->mapel_id == $m->id ? 'selected' : '' }}>
-                                {{ $m->nama_mapel }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Kelas --}}
-                <div class="mb-4">
-                    <label for="kelas_id" class="form-label fw-semibold">Kelas</label>
-                    <select name="kelas_id" id="kelas_id" class="form-select" required>
-                        <option value="">-- Pilih Kelas --</option>
-                        @foreach($kelas as $k)
-                            <option value="{{ $k->id }}" {{ $tugas->kelas_id == $k->id ? 'selected' : '' }}>
-                                {{ $k->nama_kelas }}
+                    <label for="jadwal_id" class="form-label">Pilih Jadwal (Mapel & Kelas)</label>
+                    <select name="jadwal_id" id="jadwal_id" class="form-select" required>
+                        <option value="">-- Pilih Jadwal --</option>
+                        @foreach($jadwal as $j)
+                            <option value="{{ $j->id }}" {{ $tugas->jadwal_id == $j->id ? 'selected' : '' }}>
+                                {{ $j->mapel->nama_mapel }} - {{ $j->kelas->nama_kelas }}
                             </option>
                         @endforeach
                     </select>
