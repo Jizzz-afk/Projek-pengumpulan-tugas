@@ -75,9 +75,10 @@ Route::middleware(['auth', CekRole::class . ':guru'])->prefix('guru')->as('guru.
         Route::put('/tugas/{id}', [GuruController::class, 'updateTugas'])->name('tugas.update');
         Route::delete('/tugas/hapus/{id}', [GuruController::class, 'hapusTugas'])->name('tugas.hapus');
 
-        Route::get('/penilaian', [GuruController::class, 'penilaian'])->name('penilaian');
-        Route::post('/penilaian/nilai/{id}', [GuruController::class, 'beriNilai'])->name('penilaian.nilai');
+        Route::get('penilaian', [GuruController::class, 'penilaian'])->name('penilaian');
+        Route::get('penilaian/kelas/{id}', [GuruController::class, 'penilaianKelas'])->name('penilaian.kelas');
+        Route::get('penilaian/tugas/{id}', [GuruController::class, 'penilaianTugas'])->name('penilaian.tugas');
+        Route::post('penilaian/nilai/{id}', [GuruController::class, 'beriNilai'])->name('penilaian.nilai');
     });
-
     
 require __DIR__.'/auth.php';

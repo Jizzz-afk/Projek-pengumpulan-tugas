@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Guru;
-use App\Models\Jadwal;
+use App\Models\Kelas;
 use App\Models\Tugas;
+use App\Models\Jadwal;
 use App\Models\Pengumpulan;
+use App\Models\Siswa; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 
 class GuruController extends Controller
 {
@@ -32,7 +35,7 @@ public function dashboard()
 
     $totalSiswaPerKelas = [];
     foreach ($jumlahSiswaPerKelas as $kelas => $jumlah) {
-        $totalSiswaPerKelas[$kelas] = \App\Models\Siswa::whereHas('kelas', fn($q) => $q->where('nama', $kelas))->count();
+        $totalSiswaPerKelas[$kelas] = Siswa::whereHas('kelas', fn($q) => $q->where('nama', $kelas))->count();
     }
 
     return view('guru.dashboard', compact('guru','jumlahJadwal','jumlahTugas','tugasTerakhir','jumlahMapel','totalSiswa','jumlahSiswaPerKelas','totalSiswaPerKelas'
@@ -145,20 +148,51 @@ public function dashboard()
     public function penilaian()
     {
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
-        $pengumpulan = Pengumpulan::whereHas('tugas.jadwal', fn($q)=>$q->where('guru_id',$guru->id))
-            ->with('tugas.jadwal.mapel','siswa')
+
+        $kelas = Kelas::whereHas('jadwal', function($q) use ($guru) {
+            $q->where('guru_id', $guru->id);
+        })->withCount('siswa')->get();
+
+        return view('guru.penilaian.index', compact('kelas'));
+    }
+
+    public function penilaianKelas($kelasId)
+    {
+        $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+
+        $kelas = Kelas::findOrFail($kelasId);
+
+        $tugas = Tugas::whereHas('jadwal', function($q) use ($guru, $kelasId) {
+            $q->where('guru_id', $guru->id)->where('kelas_id', $kelasId);
+        })->with('jadwal.mapel')->get();
+
+        return view('guru.penilaian.tugas', compact('kelas', 'tugas'));
+    }
+
+    public function penilaianTugas($tugasId)
+    {
+        $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+        $tugas = Tugas::with('jadwal.mapel','jadwal.kelas')->findOrFail($tugasId);
+
+        if ($tugas->jadwal->guru_id !== $guru->id) abort(403);
+
+        $pengumpulan = Pengumpulan::where('tugas_id', $tugasId)
+            ->with('siswa.kelas')
             ->get();
-        return view('guru.penilaian.index', compact('pengumpulan'));
+
+        return view('guru.penilaian.nilai', compact('tugas','pengumpulan'));
     }
 
     public function beriNilai(Request $r, $id)
     {
         $r->validate(['nilai'=>'required|integer|min:0|max:100']);
         $pengumpulan = Pengumpulan::findOrFail($id);
+
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
         if ($pengumpulan->tugas->jadwal->guru_id !== $guru->id) abort(403);
 
         $pengumpulan->update(['nilai'=>$r->nilai]);
-        return redirect()->route('guru.penilaian')->with('success','Nilai diberikan');
+
+        return back()->with('success','Nilai berhasil diberikan');
     }
 }

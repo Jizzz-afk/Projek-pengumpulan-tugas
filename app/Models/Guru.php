@@ -23,12 +23,6 @@ class Guru extends Model
         return $this->belongsToMany(Mapel::class, 'jadwal', 'guru_id', 'mapel_id')->distinct();
     }
 
-
-    public function kelasYangDibina()
-    {
-        return $this->hasMany(Kelas::class, 'wali_kelas_id');
-    }
-
     public function jadwal()
     {
         return $this->hasMany(Jadwal::class);
