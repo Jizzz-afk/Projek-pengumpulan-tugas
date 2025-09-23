@@ -28,7 +28,7 @@ class DashboardController extends Controller
     }
 
     // ======================= GURU =======================
- public function guruIndex()
+    public function guruIndex()
     {
         $guru  = Guru::with(['user','mapel','jadwal.kelas'])->get();
         $kelas = Kelas::all();
@@ -43,7 +43,9 @@ class DashboardController extends Controller
             'nama' => 'required',
             'nip' => 'required|unique:guru,nip',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'kelas_id' => 'array|max:10',
+            'mapel_id' => 'required'
         ]);
 
         $user = User::create([
@@ -90,7 +92,8 @@ class DashboardController extends Controller
             'nama' => 'required|string|max:255',
             'nip' => 'required|string|max:50|unique:guru,nip,' . $id,
             'email' => 'required|email|unique:guru,email,' . $id,
-            'mapel_id' => 'required'
+            'mapel_id' => 'required',
+            'kelas_id' => 'array|max:10'
         ]);
 
         $guru->update([

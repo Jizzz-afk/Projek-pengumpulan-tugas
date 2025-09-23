@@ -76,3 +76,20 @@
     </div>
 </div>
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('input[name="kelas_id[]"]');
+    const max = 10;
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            let checkedCount = document.querySelectorAll('input[name="kelas_id[]"]:checked').length;
+            if (checkedCount > max) {
+                alert("Maksimal hanya 10 kelas yang bisa dipilih.");
+                this.checked = false;
+            }
+        });
+    });
+});
+</script>
