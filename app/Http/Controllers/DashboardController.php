@@ -127,21 +127,32 @@ class DashboardController extends Controller
     }
 
     // ======================= SISWA =======================
-    public function siswaIndex(Request $r)
+public function siswaIndex(Request $r)
 {
-    $search = $r->input('search');
+    $search = trim($r->input('search'));
 
     $siswa = Siswa::with('kelas', 'user')
         ->when($search, function ($query, $search) {
-            $query->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nis', 'like', "%{$search}%")
-                  ->orWhereHas('kelas', function ($q) use ($search) {
-                      $q->where('nama_kelas', 'like', "%{$search}%");
-                  });
+            $keywords = preg_split('/\s+/', $search); // pecah per spasi
+
+            $query->where(function ($q) use ($keywords, $search) {
+                foreach ($keywords as $word) {
+                    $q->where(function ($sub) use ($word) {
+                        $sub->where('nama', 'like', "%{$word}%")
+                            ->orWhere('nis', 'like', "%{$word}%");
+                    });
+                }
+
+                // cari kelas dengan full string
+                $q->orWhereHas('kelas', function ($q2) use ($search) {
+                    $q2->where('nama_kelas', 'like', "%{$search}%");
+                });
+            });
         })
-        ->orderBy('nama')
-        ->paginate(10) // biar bisa pakai links()
-        ->withQueryString(); // supaya parameter search tetap ada saat pindah halaman
+        ->orderBy('kelas_id', 'asc')
+        ->orderBy('nama', 'asc')
+        ->paginate(34)
+        ->withQueryString();
 
     $kelas = Kelas::all();
 
