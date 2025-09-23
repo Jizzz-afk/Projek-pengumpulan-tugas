@@ -10,6 +10,26 @@ use Illuminate\Http\Request;
 
 class SiswaController extends Controller
 {
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+
+        $siswa = \App\Models\Siswa::with('kelas')
+            ->when($search, function ($query, $search) {
+                $query->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nis', 'like', "%{$search}%")
+                    ->orWhereHas('kelas', function ($q) use ($search) {
+                        $q->where('nama_kelas', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->get();
+
+        $kelas = \App\Models\Kelas::all();
+
+        return view('admin.siswa.index', compact('siswa', 'kelas'));
+    }
+
     public function dashboard()
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
