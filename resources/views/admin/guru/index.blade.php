@@ -31,7 +31,7 @@
 
                 {{-- Pilih Kelas --}}
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Pilih Kelas (maks. 3)</label>
+                    <label class="form-label fw-semibold">Pilih Kelas (maks. 10)</label>
                     <div class="row">
                         @foreach($kelas as $k)
                             <div class="col-md-4">
@@ -50,7 +50,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <small class="text-muted">Pilih maksimal 3 kelas.</small>
+                    <small class="text-muted">Pilih maksimal 10 kelas.</small>
                 </div>
 
                 {{-- Pilih Mapel --}}
@@ -137,3 +137,20 @@
     </div>
 </div>
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('input[name="kelas_id[]"]');
+    const max = 10;
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            let checkedCount = document.querySelectorAll('input[name="kelas_id[]"]:checked').length;
+            if (checkedCount > max) {
+                alert("Maksimal hanya 10 kelas yang bisa dipilih.");
+                this.checked = false;
+            }
+        });
+    });
+});
+</script>
