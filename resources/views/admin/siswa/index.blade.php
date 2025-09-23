@@ -68,21 +68,23 @@
     </div>
 
     {{-- Filter Search --}}
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="GET" action="{{ url('/admin/siswa') }}" class="row g-2">
-                <div class="col-md-8">
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        class="form-control form-control-lg" placeholder="Cari nama, NIS, atau kelas...">
-                </div>
-                <div class="col-md-4 d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-search"></i> Cari
-                    </button>
-                </div>
-            </form>
-        </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.siswa.index') }}" class="row g-2">
+            <div class="col-md-8">
+                <input type="text" name="search" value="{{ request('search') }}"
+                    class="form-control form-control-lg"
+                    placeholder="Cari nama, NIS, atau kelas...">
+            </div>
+            <div class="col-md-4 d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-search"></i> Cari
+                </button>
+            </div>
+        </form>
     </div>
+</div>
+
 
     {{-- Tabel Data Siswa --}}
     <div class="table-responsive shadow-sm rounded-3">

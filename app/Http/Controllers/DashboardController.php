@@ -127,13 +127,26 @@ class DashboardController extends Controller
     }
 
     // ======================= SISWA =======================
-    public function siswaIndex()
-    {
-        return view('admin.siswa.index', [
-            'siswa' => Siswa::with('kelas', 'user')->get(),
-            'kelas' => Kelas::all()
-        ]);
-    }
+    public function siswaIndex(Request $r)
+{
+    $search = $r->input('search');
+
+    $siswa = Siswa::with('kelas', 'user')
+        ->when($search, function ($query, $search) {
+            $query->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nis', 'like', "%{$search}%")
+                  ->orWhereHas('kelas', function ($q) use ($search) {
+                      $q->where('nama_kelas', 'like', "%{$search}%");
+                  });
+        })
+        ->orderBy('nama')
+        ->paginate(10) // biar bisa pakai links()
+        ->withQueryString(); // supaya parameter search tetap ada saat pindah halaman
+
+    $kelas = Kelas::all();
+
+    return view('admin.siswa.index', compact('siswa', 'kelas'));
+}
 
     public function siswaStore(Request $r)
     {
