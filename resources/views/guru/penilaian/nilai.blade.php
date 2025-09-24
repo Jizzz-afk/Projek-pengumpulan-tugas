@@ -4,11 +4,15 @@
 <div class="container py-4">
     <h3 class="fw-bold text-info mb-4">
         ✏️ Penilaian: {{ $tugas->judul }} <br>
-        <small class="text-muted">{{ $tugas->jadwal->mapel->nama_mapel ?? '-' }} - {{ $tugas->jadwal->kelas->nama_kelas ?? '-' }}</small>
+        <small class="text-muted">
+            {{ $tugas->jadwal->mapel->nama_mapel ?? '-' }} - {{ $tugas->jadwal->kelas->nama_kelas ?? '-' }}
+        </small>
     </h3>
 
-    <div class="card shadow-sm border-0">
+    {{-- Tabel siswa yang sudah mengumpulkan --}}
+    <div class="card shadow-sm border-0 mb-4">
         <div class="card-body table-responsive">
+            <h5 class="fw-bold text-success mb-3">✅ Sudah Mengumpulkan</h5>
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
@@ -44,7 +48,8 @@
                             <td>
                                 <form method="POST" action="{{ route('guru.penilaian.nilai', $p->id) }}" class="d-flex">
                                     @csrf
-                                    <input type="number" name="nilai" min="0" max="100" class="form-control form-control-sm me-2"
+                                    <input type="number" name="nilai" min="0" max="100"
+                                           class="form-control form-control-sm me-2"
                                            value="{{ $p->nilai ?? '' }}" required>
                                     <button class="btn btn-sm btn-success">✔</button>
                                 </form>
@@ -52,7 +57,32 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted">Belum ada pengumpulan</td>
+                            <td colspan="5" class="text-center text-muted">Belum ada yang mengumpulkan</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{-- Tabel siswa yang belum mengumpulkan --}}
+    <div class="card shadow-sm border-0">
+        <div class="card-body table-responsive">
+            <h5 class="fw-bold text-danger mb-3">🚫 Belum Mengumpulkan</h5>
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nama Siswa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($belumMengumpulkan as $s)
+                        <tr>
+                            <td>{{ $s->nama }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">Semua siswa sudah mengumpulkan 🎉</td>
                         </tr>
                     @endforelse
                 </tbody>

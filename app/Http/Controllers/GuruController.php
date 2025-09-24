@@ -182,19 +182,30 @@ public function dashboard()
         return view('guru.penilaian.tugas', compact('kelas', 'tugas'));
     }
 
-    public function penilaianTugas($tugasId)
-    {
-        $guru = Guru::where('user_id', Auth::id())->firstOrFail();
-        $tugas = Tugas::with('jadwal.mapel','jadwal.kelas')->findOrFail($tugasId);
+public function penilaianTugas($tugasId)
+{
+    $guru = Guru::where('user_id', Auth::id())->firstOrFail();
+    $tugas = Tugas::with('jadwal.mapel','jadwal.kelas')->findOrFail($tugasId);
 
-        if ($tugas->jadwal->guru_id !== $guru->id) abort(403);
+    if ($tugas->jadwal->guru_id !== $guru->id) abort(403);
 
-        $pengumpulan = Pengumpulan::where('tugas_id', $tugasId)
-            ->with('siswa.kelas')
-            ->get();
+    $pengumpulan = Pengumpulan::where('tugas_id', $tugasId)
+        ->with('siswa.kelas')
+        ->get();
 
-        return view('guru.penilaian.nilai', compact('tugas','pengumpulan'));
-    }
+    // siswa kelas terkait
+    $siswaKelas = Siswa::where('kelas_id', $tugas->jadwal->kelas_id)
+        ->orderBy('nama', 'asc')
+        ->get();
+
+    // siswa yang sudah kumpul
+    $sudah = $pengumpulan->pluck('siswa_id')->toArray();
+
+    // siswa yang belum kumpul
+    $belumMengumpulkan = $siswaKelas->whereNotIn('id', $sudah);
+
+    return view('guru.penilaian.nilai', compact('tugas','pengumpulan','belumMengumpulkan'));
+}
 
     public function beriNilai(Request $r, $id)
     {
