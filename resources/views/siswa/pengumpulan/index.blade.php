@@ -23,6 +23,7 @@
                 <tr>
                     <th style="width: 20%;">Judul</th>
                     <th style="width: 15%;">Mapel</th>
+                    <th style="width: 15%;">Guru</th>
                     <th style="width: 20%;">Deadline</th>
                     <th style="width: 20%;">Status</th>
                     <th style="width: 15%;" class="text-center">Aksi</th>
@@ -46,6 +47,10 @@
                         <!-- Mapel -->
                         <td>
                             {{ $t->mapel->nama_mapel ?? '-' }}
+                        </td>
+
+                        <td>
+                            {{ $t->jadwal->guru->user->name ?? '-' }}
                         </td>
 
                         <!-- Deadline -->
