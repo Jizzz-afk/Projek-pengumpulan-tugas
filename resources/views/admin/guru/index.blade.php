@@ -70,6 +70,31 @@
             </form>
         </div>
     </div>
+    {{-- Form Filter Pencarian --}}
+<div class="card mb-3 shadow-sm">
+    <div class="card-body">
+        <form method="GET" action="{{ url('/admin/guru') }}" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Cari nama, email, atau NIP..."
+                    value="{{ request('q') }}">
+            </div>
+            <div class="col-md-3">
+                <select name="mapel_id" class="form-select">
+                    <option value="">-- Semua Mapel --</option>
+                    @foreach($mapel as $m)
+                        <option value="{{ $m->id }}" {{ request('mapel_id') == $m->id ? 'selected' : '' }}>
+                            {{ $m->nama_mapel }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Cari</button>
+                <a href="{{ url('/admin/guru') }}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
 
     {{-- Tabel Guru --}}
     <div class="card shadow-sm">

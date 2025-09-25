@@ -28,14 +28,31 @@ class DashboardController extends Controller
     }
 
     // ======================= GURU =======================
-    public function guruIndex()
+    public function guruIndex(Request $r)
     {
-        $guru  = Guru::with(['user','mapel','jadwal.kelas'])->get();
+        $query = Guru::with(['user','mapel','jadwal.kelas']);
+
+        if ($r->q) {
+            $query->where(function($q) use ($r) {
+                $q->where('nama', 'like', '%'.$r->q.'%')
+                ->orWhere('email', 'like', '%'.$r->q.'%')
+                ->orWhere('nip', 'like', '%'.$r->q.'%');
+            });
+        }
+
+        if ($r->mapel_id) {
+            $query->whereHas('mapel', function($q) use ($r) {
+                $q->where('mapel_id', $r->mapel_id);
+            });
+        }
+
+        $guru  = $query->get();
         $kelas = Kelas::all();
         $mapel = Mapel::all();
 
         return view('admin.guru.index', compact('guru', 'kelas', 'mapel'));
     }
+
 
     public function guruStore(Request $r)
     {
@@ -244,7 +261,9 @@ public function siswaIndex(Request $r)
         $query = Kelas::withCount('siswa');
 
         if ($request->has('q') && $request->q != '') {
-            $query->where('nama_kelas', 'like', '%' . $request->q . '%')->orWhere('wali_kelas', 'like', '%' . $request->q . '%')->orWhere('deskripsi', 'like', '%' . $request->q . '%');
+            $query->where('nama_kelas', 'like', '%' . $request->q . '%')
+            ->orWhere('wali_kelas', 'like', '%' . $request->q . '%')
+            ->orWhere('deskripsi', 'like', '%' . $request->q . '%');
         }
 
         $kelas = $query->get();
@@ -301,11 +320,17 @@ public function siswaIndex(Request $r)
 
 
     // ======================= MAPEL =======================
-    public function mapelIndex()
+    public function mapelIndex(Request $r)
     {
-        return view('admin.mapel.index', [
-            'mapel' => Mapel::all()
-        ]);
+        $query = Mapel::query();
+
+        if ($r->q) {
+            $query->where('nama_mapel', 'like', '%'.$r->q.'%');
+        }
+
+        $mapel = $query->orderBy('nama_mapel')->get();
+
+        return view('admin.mapel.index', compact('mapel'));
     }
 
     public function mapelStore(Request $r)

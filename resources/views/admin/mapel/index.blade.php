@@ -29,7 +29,21 @@
             </form>
         </div>
     </div>
-
+    {{-- Form Filter Pencarian --}}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.mapel.index') }}" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <input type="text" name="q" class="form-control" placeholder="Cari nama mapel..."
+                        value="{{ request('q') }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary">Cari</button>
+                    <a href="{{ route('admin.mapel.index') }}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="card shadow-sm">
         <div class="card-body">
