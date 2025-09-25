@@ -239,12 +239,19 @@ public function siswaIndex(Request $r)
     }
 
     // ======================= KELAS =======================
-    public function kelasIndex()
+    public function kelasIndex(Request $request)
     {
-        return view('admin.kelas.index', [
-            'kelas' => Kelas::withCount('siswa')->get()
-        ]);
+        $query = Kelas::withCount('siswa');
+
+        if ($request->has('q') && $request->q != '') {
+            $query->where('nama_kelas', 'like', '%' . $request->q . '%')->orWhere('wali_kelas', 'like', '%' . $request->q . '%')->orWhere('deskripsi', 'like', '%' . $request->q . '%');
+        }
+
+        $kelas = $query->get();
+
+        return view('admin.kelas.index', compact('kelas'));
     }
+
 
     public function kelasStore(Request $r)
     {
@@ -283,6 +290,16 @@ public function siswaIndex(Request $r)
         return back()->with('success', 'Kelas dihapus');
     }
 
+    public function KelasDetail($id)
+{
+    $kelas = Kelas::withCount('siswa')
+        ->with('siswa') 
+        ->findOrFail($id);
+
+    return view('admin.kelas.detail', compact('kelas'));
+}
+
+
     // ======================= MAPEL =======================
     public function mapelIndex()
     {
@@ -300,18 +317,34 @@ public function siswaIndex(Request $r)
         return back()->with('success', 'Mapel ditambahkan');
     }
 
+    public function mapelEdit($id)
+    {
+        $mapel = Mapel::findOrFail($id);
+        return view('admin.mapel.edit', compact('mapel'));
+    }
+
     public function mapelUpdate(Request $r, $id)
     {
         $r->validate([
             'nama_mapel' => 'required|unique:mapel,nama_mapel,' . $id,
         ]);
-        Mapel::findOrFail($id)->update($r->all());
+
+        Mapel::findOrFail($id)->update([
+            'nama_mapel' => $r->nama_mapel
+        ]);
+
         return redirect()->route('admin.mapel.index')->with('success', 'Mapel diperbarui');
     }
 
     public function mapelDelete($id)
     {
-        Mapel::destroy($id);
+        $mapel = Mapel::findOrFail($id);
+
+        if ($mapel->jadwal()->exists()) {
+            return back()->with('error', 'Mapel ini tidak bisa dihapus.');
+        }
+
+        $mapel->delete();
         return back()->with('success', 'Mapel dihapus');
     }
 

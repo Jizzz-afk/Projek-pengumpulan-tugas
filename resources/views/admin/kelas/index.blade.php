@@ -14,30 +14,47 @@
         </div>
     @endif
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <form method="POST" action="{{ url('/admin/kelas') }}" class="row g-3 align-items-center">
-                @csrf
-                <div class="col-md-5">
-                    <input type="text" name="nama_kelas" placeholder="Nama Kelas" class="form-control form-control-lg" required>
-                </div>
-                <div class="col-md-5">
-                    <input type="text" name="deskripsi" placeholder="Deskripsi" class="form-control form-control-lg" required>
-                </div>
-                <div class="col-md-5">
+        <form method="POST" action="{{ url('/admin/kelas') }}" class="row g-3 align-items-center">
+            @csrf
+            <div class="col-md-5">
+                <input type="text" name="nama_kelas" placeholder="Nama Kelas" class="form-control form-control-lg" required>
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="deskripsi" placeholder="Deskripsi" class="form-control form-control-lg" required>
+            </div>
+            <div class="col-md-5">
                 <select name="wali_kelas" class="form-select form-select-lg" required>
                     <option value="" disabled selected>Pilih Wali Kelas</option>
                     @foreach($kelas as $k)
                         <option value="{{ $k->wali_kelas }}">{{ $k->wali_kelas }}</option>
                     @endforeach
                 </select>
-                </div>
-                <div class="d-grid">
-                    <button class="btn btn-primary btn-lg fw-semibold" type="submit">Tambah Kelas</button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="d-grid">
+                <button class="btn btn-primary btn-lg fw-semibold" type="submit">Tambah Kelas</button>
+            </div>
+        </form>
+        <div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url('/admin/kelas') }}" class="row g-2 mb-3">
+            <div class="col-md-6">
+                <input type="text" name="q" class="form-control" placeholder="Cari kelas, wali kelas, atau deskripsi..."
+                       value="{{ request('q') }}">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" type="submit">
+                    <i class="bi bi-search"></i> Cari
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ url('/admin/kelas') }}" class="btn btn-secondary w-100">
+                    <i class="bi bi-x-circle"></i> Reset
+                </a>
+            </div>
+        </form>
     </div>
+</div>
+
 
     <div class="row">
         @forelse($kelas as $k)

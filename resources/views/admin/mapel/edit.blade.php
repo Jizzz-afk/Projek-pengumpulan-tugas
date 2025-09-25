@@ -9,22 +9,15 @@
             <form action="{{ route('admin.mapel.update', $mapel->id) }}" method="POST">
                 @csrf
                 @method('PUT')
-
-                <div class="mb-3">
-                    <label for="nama_mapel" class="form-label fw-semibold">Nama Mapel</label>
-                    <input type="text" id="nama_mapel" name="nama_mapel" value="{{ old('nama_mapel', $mapel->nama_mapel) }}" class="form-control @error('nama_mapel') is-invalid @enderror" required>
-                    @error('nama_mapel')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.mapel.index') }}" class="btn btn-secondary">
-                        Kembali
-                    </a>
-                    <button type="submit" class="btn btn-primary fw-semibold">
-                        Simpan Perubahan
-                    </button>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <input type="text" name="nama_mapel" class="form-control"
+                            value="{{ old('nama_mapel', $mapel->nama_mapel) }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-success fw-semibold">Update</button>
+                        <a href="{{ route('admin.mapel.index') }}" class="btn btn-secondary">Batal</a>
+                    </div>
                 </div>
             </form>
         </div>

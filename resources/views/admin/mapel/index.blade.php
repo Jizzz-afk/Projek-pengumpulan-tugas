@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if (session('success') || session('error'))
+    <div class="alert alert-{{ session('success') ? 'success' : 'danger' }}">
+        {{ session('success') ?? session('error') }}
+    </div>
+@endif
+
 <div class="container py-4">
     <h3 class="mb-4 text-primary fw-bold">Data Mata Pelajaran</h3>
 
