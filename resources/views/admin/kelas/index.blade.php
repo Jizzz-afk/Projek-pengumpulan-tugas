@@ -14,48 +14,72 @@
         </div>
     @endif
 
-        <form method="POST" action="{{ url('/admin/kelas') }}" class="row g-3 align-items-center">
-            @csrf
-            <div class="col-md-5">
-                <input type="text" name="nama_kelas" placeholder="Nama Kelas" class="form-control form-control-lg" required>
-            </div>
-            <div class="col-md-5">
-                <input type="text" name="deskripsi" placeholder="Deskripsi" class="form-control form-control-lg" required>
-            </div>
-            <div class="col-md-5">
-                <select name="wali_kelas" class="form-select form-select-lg" required>
-                    <option value="" disabled selected>Pilih Wali Kelas</option>
-                    @foreach($kelas as $k)
-                        <option value="{{ $k->wali_kelas }}">{{ $k->wali_kelas }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="d-grid">
-                <button class="btn btn-primary btn-lg fw-semibold" type="submit">Tambah Kelas</button>
-            </div>
-        </form>
-        <div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <form method="GET" action="{{ url('/admin/kelas') }}" class="row g-2 mb-3">
-            <div class="col-md-6">
-                <input type="text" name="q" class="form-control" placeholder="Cari kelas, wali kelas, atau deskripsi..."
-                       value="{{ request('q') }}">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100" type="submit">
-                    <i class="bi bi-search"></i> Cari
+    {{-- Filter + Tombol Tambah --}}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <form method="GET" action="{{ url('/admin/kelas') }}" class="d-flex flex-wrap gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Cari kelas, wali kelas, atau deskripsi..."
+                           value="{{ request('q') }}">
+                </div>
+                <button class="btn btn-primary d-flex align-items-center gap-1" type="submit">
+                    <i class="bi bi-funnel"></i> Cari
                 </button>
-            </div>
-            <div class="col-md-2">
-                <a href="{{ url('/admin/kelas') }}" class="btn btn-secondary w-100">
-                    <i class="bi bi-x-circle"></i> Reset
+                <a href="{{ url('/admin/kelas') }}" class="btn btn-secondary d-flex align-items-center gap-1">
+                    <i class="bi bi-arrow-clockwise"></i> Reset
                 </a>
-            </div>
-        </form>
+            </form>
+
+            <button class="btn btn-success fw-semibold d-flex align-items-center gap-1"
+                data-bs-toggle="modal" data-bs-target="#modalTambahKelas">
+                <i class="bi bi-plus-circle"></i> Tambah Kelas
+            </button>
+        </div>
     </div>
-</div>
 
+    {{-- Modal Tambah Kelas --}}
+    <div class="modal fade" id="modalTambahKelas" tabindex="-1" aria-labelledby="modalTambahKelasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg rounded-3">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-semibold" id="modalTambahKelasLabel">
+                        <i class="bi bi-plus-circle"></i> Tambah Kelas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url('/admin/kelas') }}">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="nama_kelas" class="form-label fw-semibold">Nama Kelas</label>
+                                <input type="text" name="nama_kelas" id="nama_kelas" class="form-control" placeholder="Contoh: X IPA 1" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="wali_kelas" class="form-label fw-semibold">Wali Kelas</label>
+                                <input type="text" name="wali_kelas" id="wali_kelas" class="form-control" placeholder="Nama wali kelas" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="deskripsi" class="form-label fw-semibold">Deskripsi</label>
+                                <textarea name="deskripsi" id="deskripsi" class="form-control" placeholder="Contoh: Kelas unggulan untuk IPA" rows="2" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Batal
+                        </button>
+                        <button type="submit" class="btn btn-success fw-semibold">
+                            <i class="bi bi-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
+    {{-- Grid Kelas --}}
     <div class="row">
         @forelse($kelas as $k)
         <div class="col-md-3 mb-4">
@@ -67,14 +91,15 @@
                     <p><strong>Wali Kelas:</strong> {{ $k->wali_kelas }}</p>
                 </div>
                 <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                    <a href="{{ route('admin.kelas.detail', $k->id) }}" class="btn btn-sm btn-info">
+                    <a href="{{ route('admin.kelas.detail', $k->id) }}" class="btn btn-sm btn-info d-flex align-items-center gap-1">
                         <i class="bi bi-info-circle"></i> Detail
                     </a>
                     <div>
                         <a href="{{ url('/admin/kelas/'.$k->id.'/edit') }}" class="btn btn-sm btn-warning me-1">
                             <i class="bi bi-pencil-square"></i>
                         </a>
-                        <form method="POST" action="{{ url('/admin/kelas/'.$k->id) }}" style="display:inline-block" onsubmit="return confirm('Yakin ingin menghapus?')">
+                        <form method="POST" action="{{ url('/admin/kelas/'.$k->id) }}" style="display:inline-block"
+                              onsubmit="return confirm('Yakin ingin menghapus?')">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger">
