@@ -14,7 +14,6 @@ class SiswaController extends Controller
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-        // Ambil tugas berdasarkan kelas siswa via jadwal
         $tugas = Tugas::whereHas('jadwal', function ($q) use ($siswa) {
             $q->where('kelas_id', $siswa->kelas_id);
         })->get();
@@ -97,10 +96,10 @@ class SiswaController extends Controller
     {
         $siswa = Siswa::where('user_id', Auth::id())->firstOrFail();
 
-        $riwayat = Pengumpulan::with('tugas.jadwal.mapel')
-            ->where('siswa_id', $siswa->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $riwayat = Pengumpulan::with('tugas.jadwal.mapel', 'tugas.jadwal.guru.user')
+        ->where('siswa_id', $siswa->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
         return view('siswa.riwayat', compact('riwayat'));
     }

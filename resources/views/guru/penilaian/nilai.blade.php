@@ -16,6 +16,7 @@
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
+                        <th>No</th>
                         <th>Nama Siswa</th>
                         <th>Kelas</th>
                         <th>File</th>
@@ -26,6 +27,7 @@
                 <tbody>
                     @forelse($pengumpulan as $p)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $p->siswa->nama }}</td>
                             <td>{{ $p->siswa->kelas->nama_kelas ?? '-' }}</td>
                             <td>
@@ -65,19 +67,20 @@
         </div>
     </div>
 
-    {{-- Tabel siswa yang belum mengumpulkan --}}
     <div class="card shadow-sm border-0">
         <div class="card-body table-responsive">
             <h5 class="fw-bold text-danger mb-3">🚫 Belum Mengumpulkan</h5>
             <table class="table table-hover align-middle">
                 <thead class="table-light">
                     <tr>
+                        <th>No</th>
                         <th>Nama Siswa</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($belumMengumpulkan as $s)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $s->nama }}</td>
                         </tr>
                     @empty

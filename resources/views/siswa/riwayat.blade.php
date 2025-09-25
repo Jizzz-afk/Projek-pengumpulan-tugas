@@ -20,6 +20,7 @@
                     <tr>
                         <th class="text-center" style="width: 50px;">#</th>
                         <th>Judul Tugas</th>
+                        <th class="y=text-center">Guru</th>
                         <th class="text-center">File</th>
                         <th class="text-center">Nilai</th>
                         <th>Catatan</th>
@@ -33,8 +34,8 @@
                             <td colspan="6" class="text-center py-5 bg-light">
                                 <div class="d-flex flex-column align-items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" 
-                                         fill="currentColor" class="text-secondary mb-3 animate-archive" 
-                                         viewBox="0 0 16 16">
+                                        fill="currentColor" class="text-secondary mb-3 animate-archive" 
+                                        viewBox="0 0 16 16">
                                         <path d="M4.81.783A1.5 1.5 0 0 1 6.207 0h3.586a1.5 1.5 0 0 1 1.397.783L14.118 4H1.882l2.928-3.217z"/>
                                         <path d="M.5 4.5h15a.5.5 0 0 1 .5.5V5a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-.5a.5.5 0 0 1 .5-.5z"/>
                                         <path d="M1 7h14v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7zm4.5 2a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/>
@@ -55,9 +56,12 @@
                                         {{ $r->tugas->mapel->nama_mapel ?? 'Tidak ada mata pelajaran' }}
                                     </small>
                                 </td>
+                                <td>
+                                    {{ $r->tugas->jadwal->guru->user->name ?? '-' }}
+                                </td>
                                 <td class="text-center">
                                     <a href="{{ asset('storage/' . $r->file) }}" target="_blank" 
-                                       class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
+                                        class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-sm">
                                         <i class="bi bi-eye"></i> Lihat
                                     </a>
                                 </td>
