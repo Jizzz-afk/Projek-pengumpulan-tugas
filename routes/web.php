@@ -10,9 +10,9 @@ use App\Http\Middleware\CekRole;
 
 Route::get('/', function () {
     if (Auth::check()) {
-        return redirect()->intended(auth::user()->role . '/dashboard');
+        return redirect()->intended(Auth::user()->role . '/dashboard');
     }
-    return redirect()->route('login');
+    return redirect()->route('landing');
 });
 
 
