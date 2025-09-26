@@ -12,8 +12,8 @@ Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->intended(Auth::user()->role . '/dashboard');
     }
-    return redirect()->route('landing');
-});
+    return view('landing'); 
+})->name('landing');
 
 
 Route::middleware(['auth', CekRole::class . ':admin' ])->prefix('admin')->group(function () {

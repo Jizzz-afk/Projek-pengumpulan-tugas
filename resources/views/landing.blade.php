@@ -323,7 +323,7 @@
       <a href="#features">Fitur</a>
       <a href="https://smkn1-cirebon.sch.id/" target="_blank">Website Sekolah</a>
     </nav>
-    <a href="login.html" class="btn-login">Login</a>
+    <a href="{{ route('login') }}" class="btn-login">Login</a>
   </header>
   
   <button class="theme-toggle" type="button" id="themeToggle" aria-label="Toggle tema">
@@ -338,7 +338,7 @@
         Selamat datang di Portal Pengumpulan Tugas Online SMKN 1 Cirebon. Platform digital untuk menyederhanakan proses belajar mengajar.
       </p>
       <div class="hero-cta fade-in-up" style="animation-delay: 0.4s;">
-        <a href="login.html" class="btn-login">Mulai Kumpulkan Tugas</a>
+        <a href="{{ route('login') }}" class="btn-login">Mulai Kumpulkan Tugas</a>
       </div>
     </section>
 
@@ -354,7 +354,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path><path d="M13 7h-2v5.414l3.293 3.293 1.414-1.414L13 11.586z"></path></svg>
           </div>
           <h3 class="feature-title">Pengumpulan Tepat Waktu</h3>
-          <p class="feature-desc">Unggah tugas kapan saja sebelum tenggat waktu. Sistem akan mencatat waktu pengumpulan secara otomatis.</p>
+          <p class="feature-desc">Unggah tugas kapan saja sebelum deadline. Sistem akan mencatat waktu pengumpulan secara otomatis.</p>
         </div>
 
         <div class="feature-card fade-in-up" style="--i:2; animation-delay: 0.6s;">
@@ -370,7 +370,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="m10 15.586-3.293-3.293-1.414 1.414L10 18.414l9.707-9.707-1.414-1.414z"></path></svg>
           </div>
           <h3 class="feature-title">Penilaian Transparan</h3>
-          <p class="feature-desc">Lihat nilai dan masukan dari guru langsung di dasbor akun Anda. Lebih cepat, jelas, dan tanpa kertas.</p>
+          <p class="feature-desc">Lihat nilai dan masukan dari guru langsung di dashboard akun Anda. Lebih cepat, jelas, dan tanpa kertas.</p>
         </div>
       </div>
     </section>
