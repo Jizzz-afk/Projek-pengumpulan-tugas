@@ -52,14 +52,40 @@ public function dashboard()
     }
 
     // ==================== TUGAS ====================
-    public function tugas()
+    public function tugas(Request $request)
     {
         $guru = Guru::where('user_id', Auth::id())->firstOrFail();
-        $tugas = Tugas::whereHas('jadwal', fn($q)=>$q->where('guru_id',$guru->id))
-            ->with('jadwal.mapel','jadwal.kelas')
-            ->get();
-        return view('guru.tugas.index', compact('tugas'));
+
+        $mapelList = Mapel::whereHas('jadwal', fn($q) => $q->where('guru_id', $guru->id))->get();
+        $kelasList = Kelas::whereHas('jadwal', fn($q) => $q->where('guru_id', $guru->id))->get();
+
+        $query = Tugas::whereHas('jadwal', fn($q) => $q->where('guru_id', $guru->id))
+            ->with('jadwal.mapel','jadwal.kelas');
+
+        if ($request->filled('judul')) {
+            $query->where('judul', 'like', '%'.$request->judul.'%');
+        }
+
+        if ($request->filled('mapel')) {
+            $query->whereHas('jadwal.mapel', fn($q) => $q->where('id', $request->mapel));
+        }
+
+        if ($request->filled('kelas')) {
+            $query->whereHas('jadwal.kelas', fn($q) => $q->where('id', $request->kelas));
+        }
+
+        if ($request->status == 'aktif') {
+            $query->where('deadline', '>=', now());
+        } elseif ($request->status == 'lewat') {
+            $query->where('deadline', '<', now());
+        }
+
+        $tugas = $query->latest()->get();
+
+        return view('guru.tugas.index', compact('tugas','mapelList','kelasList'));
     }
+
+
 
     public function buatTugas()
     {
