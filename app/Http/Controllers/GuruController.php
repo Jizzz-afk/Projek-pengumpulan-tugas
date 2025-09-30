@@ -73,29 +73,33 @@ public function dashboard()
 
 
         public function simpanTugas(Request $r)
-    {
-        $r->validate([
-            'jadwal_id' => 'required|exists:jadwal,id',
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'deadline' => 'required|date',
-            'foto_tugas' => 'nullable|file|max:2048'
-        ]);
+{
+    $r->validate([
+        'jadwal_id'   => 'required|array',
+        'jadwal_id.*' => 'exists:jadwal,id',
+        'judul'       => 'required|string|max:255',
+        'deskripsi'   => 'nullable|string',
+        'deadline'    => 'required|date',
+        'foto_tugas'  => 'nullable|file|max:2048'
+    ]);
 
-        $path = $r->hasFile('foto_tugas')
-            ? $r->file('foto_tugas')->store('tugas', 'public')
-            : null;
+    $path = $r->hasFile('foto_tugas')
+        ? $r->file('foto_tugas')->store('tugas', 'public')
+        : null;
 
+    // simpan tugas untuk setiap jadwal yang dipilih
+    foreach ($r->jadwal_id as $jadwalId) {
         Tugas::create([
-            'jadwal_id' => $r->jadwal_id,
-            'judul'     => $r->judul,
-            'deskripsi' => $r->deskripsi,
-            'deadline'  => $r->deadline,
-            'foto_tugas'=> $path
+            'jadwal_id'  => $jadwalId,
+            'judul'      => $r->judul,
+            'deskripsi'  => $r->deskripsi,
+            'deadline'   => $r->deadline,
+            'foto_tugas' => $path
         ]);
-
-        return redirect()->route('guru.tugas')->with('success','Tugas dibuat');
     }
+
+    return redirect()->route('guru.tugas')->with('success','Tugas berhasil dibuat untuk semua jadwal terpilih');
+}
 
     public function editTugas($id)
     {
