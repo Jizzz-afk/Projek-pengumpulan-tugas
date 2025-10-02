@@ -44,7 +44,7 @@ class GuruSeeder extends Seeder
                 ['email' => $guruData['email']],
                 [
                     'name' => $guruData['nama'],
-                    'password' => Hash::make('guru123'), // Password default konsisten
+                    'password' => Hash::make('guru123'),
                     'role' => 'guru',
                 ]
             );

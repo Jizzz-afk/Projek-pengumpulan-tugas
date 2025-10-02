@@ -12,77 +12,52 @@ class JadwalSeeder extends Seeder
 {
     public function run(): void
     {
-        // Mapping guru -> mapel
-        $guruMapel = [
-            'Bu Titin'   => 'Gambar Teknik',
-            'Pak Joko'   => 'Konstruksi Bangunan',
-            'Bu Anisa'   => 'Perencanaan Struktur Bangunan',
-            'Pak Fajar'  => 'Estimasi Biaya Konstruksi',
+        // Mapping guru -> kelas -> mapel
+        $data = [
+            ['guru' => 'Bu Titin',   'kelas' => 'XII DPIB 1', 'mapel' => 'Gambar Teknik'],
+            ['guru' => 'Pak Joko',   'kelas' => 'XII DPIB 2', 'mapel' => 'Konstruksi Bangunan'],
+            ['guru' => 'Bu Anisa',   'kelas' => 'XII DPIB 3', 'mapel' => 'Perencanaan Struktur Bangunan'],
+            ['guru' => 'Pak Fajar',  'kelas' => 'XII DPIB 4', 'mapel' => 'Estimasi Biaya Konstruksi'],
 
-            'Bu Ratna'   => 'Elektronika Dasar',
-            'Pak Budi'   => 'Sistem Mikroprosessor',
-            'Bu Wulan'   => 'Penerapan Sistem Elektronika',
-            'Pak Rian'   => 'Pemrograman Mikrokontroler',
+            ['guru' => 'Bu Ratna',   'kelas' => 'XII TEI 1',  'mapel' => 'Elektronika Dasar'],
+            ['guru' => 'Pak Budi',   'kelas' => 'XII TEI 2',  'mapel' => 'Sistem Mikroprosessor'],
+            ['guru' => 'Bu Wulan',   'kelas' => 'XII TEI 3',  'mapel' => 'Penerapan Sistem Elektronika'],
+            ['guru' => 'Pak Rian',   'kelas' => 'XII TOI',    'mapel' => 'Pemrograman Mikrokontroler'],
 
-            'Bu Sinta'   => 'Dasar Jaringan Komputer',
-            'Pak Andi'   => 'Administrasi Sistem Jaringan',
+            ['guru' => 'Bu Sinta',   'kelas' => 'XII TKJ 1',  'mapel' => 'Dasar Jaringan Komputer'],
+            ['guru' => 'Pak Andi',   'kelas' => 'XII TKJ 2',  'mapel' => 'Administrasi Sistem Jaringan'],
 
-            'Bu Dewi'    => 'Pemrograman Dasar',
-            'Pak Heru'   => 'Pemrograman Web dan Perangkat Bergerak',
+            ['guru' => 'Bu Dewi',    'kelas' => 'XII RPL 1',  'mapel' => 'Pemrograman Dasar'],
+            ['guru' => 'Pak Heru',   'kelas' => 'XII RPL 2',  'mapel' => 'Pemrograman Web dan Perangkat Bergerak'],
 
-            'Bu Lestari' => 'Dasar Instalasi Listrik',
-            'Pak Eko'    => 'Sistem Tenaga Listrik',
-            'Bu Rini'    => 'Instalasi Penerangan dan Tenaga',
+            ['guru' => 'Bu Lestari', 'kelas' => 'XII TITL 1', 'mapel' => 'Dasar Instalasi Listrik'],
+            ['guru' => 'Pak Eko',    'kelas' => 'XII TITL 2', 'mapel' => 'Sistem Tenaga Listrik'],
+            ['guru' => 'Bu Rini',    'kelas' => 'XII TITL 3', 'mapel' => 'Instalasi Penerangan dan Tenaga'],
 
-            'Pak Doni'   => 'Dasar Pengelasan',
+            ['guru' => 'Pak Doni',   'kelas' => 'XII TPTUP',  'mapel' => 'Dasar Pengelasan'],
 
-            'Bu Maya'    => 'Gambar Teknik Mesin',
-            'Pak Yudi'   => 'Pemrograman Mesin CNC',
-            'Bu Lina'    => 'Teknik Pemesinan Bubut, Frais, dan Gerinda',
+            ['guru' => 'Bu Maya',    'kelas' => 'XII TPM 1',  'mapel' => 'Gambar Teknik Mesin'],
+            ['guru' => 'Pak Yudi',   'kelas' => 'XII TPM 2',  'mapel' => 'Pemrograman Mesin CNC'],
+            ['guru' => 'Bu Lina',    'kelas' => 'XII TPM 3',  'mapel' => 'Teknik Pemesinan Bubut, Frais, dan Gerinda'],
 
-            'Pak Agus'   => 'Dasar Otomotif',
-            'Bu Rani'    => 'Pemeliharaan Mesin Kendaraan Ringan',
-            'Pak Arif'   => 'Sistem Kelistrikan Otomotif',
+            ['guru' => 'Pak Agus',   'kelas' => 'XII TKR 1',  'mapel' => 'Dasar Otomotif'],
+            ['guru' => 'Bu Rani',    'kelas' => 'XII TKR 2',  'mapel' => 'Pemeliharaan Mesin Kendaraan Ringan'],
+            ['guru' => 'Pak Arif',   'kelas' => 'XII TKR 3',  'mapel' => 'Sistem Kelistrikan Otomotif'],
 
-            'Bu Yuni'    => 'Dasar Bodi Kendaraan',
+            ['guru' => 'Bu Yuni',    'kelas' => 'XII TBKR',   'mapel' => 'Dasar Bodi Kendaraan'],
         ];
 
-        foreach ($guruMapel as $guruNama => $mapelNama) {
-            $guru  = Guru::where('nama', $guruNama)->first();
-            $mapel = Mapel::where('nama_mapel', $mapelNama)->first();
+        foreach ($data as $d) {
+            $guru  = Guru::where('nama', $d['guru'])->first();
+            $kelas = Kelas::where('nama_kelas', $d['kelas'])->first();
+            $mapel = Mapel::where('nama_mapel', $d['mapel'])->first();
 
-            if ($guru && $mapel) {
-                $jurusanKeyword = explode(' ', $mapelNama)[0]; 
-                $kelasList = Kelas::where('wali_kelas', $guruNama)->get();
-                if ($kelasList->isEmpty()) {
-                    if (str_contains($mapelNama, 'Bangunan') || str_contains($mapelNama, 'Gambar')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%DPIB%')->get();
-                    } elseif (str_contains($mapelNama, 'Elektronika') || str_contains($mapelNama, 'Mikro')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%TEI%')->get();
-                    } elseif (str_contains($mapelNama, 'Jaringan')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%TKJ%')->get();
-                    } elseif (str_contains($mapelNama, 'Pemrograman') || str_contains($mapelNama, 'Rekayasa')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%RPL%')->get();
-                    } elseif (str_contains($mapelNama, 'Instalasi') || str_contains($mapelNama, 'Listrik')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%TITL%')->get();
-                    } elseif (str_contains($mapelNama, 'Pengelasan')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%TPTUP%')->get();
-                    } elseif (str_contains($mapelNama, 'Mesin')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%TPM%')->get();
-                    } elseif (str_contains($mapelNama, 'Otomotif')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%TKR%')->get();
-                    } elseif (str_contains($mapelNama, 'Bodi')) {
-                        $kelasList = Kelas::where('nama_kelas', 'like', '%TBKR%')->get();
-                    }
-                }
-
-                foreach ($kelasList as $kelas) {
-                    Jadwal::firstOrCreate([
-                        'guru_id'  => $guru->id,
-                        'kelas_id' => $kelas->id,
-                        'mapel_id' => $mapel->id,
-                    ]);
-                }
+            if ($guru && $kelas && $mapel) {
+                Jadwal::firstOrCreate([
+                    'guru_id'  => $guru->id,
+                    'kelas_id' => $kelas->id,
+                    'mapel_id' => $mapel->id,
+                ]);
             }
         }
     }
