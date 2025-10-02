@@ -140,7 +140,6 @@
             </div>
 
             <!-- Tugas Terbaru -->
-             tambahkan ini {{ route('siswa.pengumpulan.create', ['tugas_id' => $t->id]) }} biar kalo diklik bakal ketugas tersebut
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-white border-0 py-3 border-bottom">
                     <h5 class="mb-0 fw-semibold text-primary">📌 Tugas Terbaru</h5>
