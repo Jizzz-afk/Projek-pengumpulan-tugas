@@ -140,6 +140,7 @@
             </div>
 
             <!-- Tugas Terbaru -->
+             tambahkan ini {{ route('siswa.pengumpulan.create', ['tugas_id' => $t->id]) }} biar kalo diklik bakal ketugas tersebut
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-white border-0 py-3 border-bottom">
                     <h5 class="mb-0 fw-semibold text-primary">📌 Tugas Terbaru</h5>
@@ -152,27 +153,29 @@
                             $isLate = now()->greaterThan(\Carbon\Carbon::parse($t->deadline)) && !$sudahKumpul;
                         @endphp
                         <li class="list-group-item py-3 d-flex justify-content-between align-items-start hover-bg">
-                            <div class="me-3">
-                                <div class="fw-semibold">
-                                    <i class="bi bi-journal-bookmark me-1 text-primary"></i>
-                                    {{ $t->mapel->nama_mapel ?? '-' }} — {{ $t->judul }}
+                            <a href="{{ route('siswa.pengumpulan.create', ['tugas_id' => $t->id]) }}" class="text-decoration-none text-dark d-flex w-100 justify-content-between align-items-start">
+                                <div class="me-3">
+                                    <div class="fw-semibold">
+                                        <i class="bi bi-journal-bookmark me-1 text-primary"></i>
+                                        {{ $t->mapel->nama_mapel ?? '-' }} — {{ $t->judul }}
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}
+                                    </small>
                                 </div>
-                                <small class="text-muted">
-                                    <i class="bi bi-clock me-1"></i>
-                                    Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}
-                                </small>
-                            </div>
-                            <div>
-                                @if($isLate)
-                                    <span class="badge rounded-pill bg-danger">Terlambat</span>
-                                @elseif($sudahKumpul && is_null($nilai))
-                                    <span class="badge rounded-pill bg-warning text-dark">Menunggu Nilai</span>
-                                @elseif($sudahKumpul)
-                                    <span class="badge rounded-pill bg-success">Sudah Dikirim</span>
-                                @else
-                                    <span class="badge rounded-pill bg-primary">Belum Dikerjakan</span>
-                                @endif
-                            </div>
+                                <div>
+                                    @if($isLate)
+                                        <span class="badge rounded-pill bg-danger">Terlambat</span>
+                                    @elseif($sudahKumpul && is_null($nilai))
+                                        <span class="badge rounded-pill bg-warning text-dark">Menunggu Nilai</span>
+                                    @elseif($sudahKumpul)
+                                        <span class="badge rounded-pill bg-success">Sudah Dikirim</span>
+                                    @else
+                                        <span class="badge rounded-pill bg-primary">Belum Dikerjakan</span>
+                                    @endif
+                                </div>
+                            </a>
                         </li>
                     @empty
                         <li class="list-group-item text-center text-muted">Belum ada tugas terbaru</li>
