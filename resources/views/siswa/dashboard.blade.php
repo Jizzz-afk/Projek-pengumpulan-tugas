@@ -150,9 +150,19 @@
                             $sudahKumpul = $t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->exists();
                             $nilai = $t->pengumpulan()->where('siswa_id', Auth::user()->siswa->id)->value('nilai');
                             $isLate = now()->greaterThan(\Carbon\Carbon::parse($t->deadline)) && !$sudahKumpul;
+                            $isAfterDeadlineAndSubmitted = now()->greaterThan(\Carbon\Carbon::parse($t->deadline)) && $sudahKumpul;
                         @endphp
+
                         <li class="list-group-item py-3 d-flex justify-content-between align-items-start hover-bg">
-                            <a href="{{ route('siswa.pengumpulan.create', ['tugas_id' => $t->id]) }}" class="text-decoration-none text-dark d-flex w-100 justify-content-between align-items-start">
+                            @if(!$isAfterDeadlineAndSubmitted)
+                                {{-- ✅ MASIH BISA DIKLIK --}}
+                                <a href="{{ route('siswa.pengumpulan.create', ['tugas_id' => $t->id]) }}"
+                                    class="text-decoration-none text-dark d-flex w-100 justify-content-between align-items-start">
+                            @else
+                                {{-- 🚫 SUDAH LEWAT DEADLINE DAN SUDAH DIKUMPULKAN (non-klik) --}}
+                                <div class="text-muted d-flex w-100 justify-content-between align-items-start" style="cursor:not-allowed; opacity:.7;">
+                            @endif
+
                                 <div class="me-3">
                                     <div class="fw-semibold">
                                         <i class="bi bi-journal-bookmark me-1 text-primary"></i>
@@ -163,6 +173,7 @@
                                         Deadline: {{ \Carbon\Carbon::parse($t->deadline)->format('d M Y H:i') }}
                                     </small>
                                 </div>
+
                                 <div>
                                     @if($isLate)
                                         <span class="badge rounded-pill bg-danger">Terlambat</span>
@@ -174,11 +185,17 @@
                                         <span class="badge rounded-pill bg-primary">Belum Dikerjakan</span>
                                     @endif
                                 </div>
-                            </a>
+
+                            @if(!$isAfterDeadlineAndSubmitted)
+                                </a>
+                            @else
+                                </div>
+                            @endif
                         </li>
                     @empty
                         <li class="list-group-item text-center text-muted">Belum ada tugas terbaru</li>
                     @endforelse
+
                 </ul>
             </div>
         </div>
