@@ -28,134 +28,165 @@ class DashboardController extends Controller
     }
 
     // ======================= GURU =======================
-    public function guruIndex(Request $r)
-    {
-        $query = Guru::with(['user','mapel','jadwal.kelas']);
+ public function guruIndex(Request $r)
+{
+    $query = Guru::with(['user', 'mapel', 'jadwal.kelas']);
 
-        if ($r->q) {
-            $query->where(function($q) use ($r) {
-                $q->where('nama', 'like', '%'.$r->q.'%')
-                ->orWhere('email', 'like', '%'.$r->q.'%')
-                ->orWhere('nip', 'like', '%'.$r->q.'%');
-            });
-        }
-
-        if ($r->mapel_id) {
-            $query->whereHas('mapel', function($q) use ($r) {
-                $q->where('mapel_id', $r->mapel_id);
-            });
-        }
-
-        $guru  = $query->get();
-        $kelas = Kelas::all();
-        $mapel = Mapel::all();
-
-        return view('admin.guru.index', compact('guru', 'kelas', 'mapel'));
+    // 🔍 Filter pencarian
+    if ($r->q) {
+        $query->where(function ($q) use ($r) {
+            $q->where('nama', 'like', '%'.$r->q.'%')
+              ->orWhere('email', 'like', '%'.$r->q.'%')
+              ->orWhere('nip', 'like', '%'.$r->q.'%');
+        });
     }
 
+    // 🔍 Filter mapel
+    if ($r->mapel_id) {
+        $query->whereHas('jadwal.mapel', function ($q) use ($r) {
+            $q->where('mapel_id', $r->mapel_id);
+        });
+    }
 
-    public function guruStore(Request $r)
-    {
-        $r->validate([
-            'nama' => 'required',
-            'nip' => 'required|unique:guru,nip',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'kelas_id' => 'required|exists:kelas,id',
-            'mapel_id' => 'required|exists:mapel,id',
-        ]);
+    $guru  = $query->get();
+    $kelas = Kelas::all();
+    $mapel = Mapel::all();
 
-        $cek = Jadwal::where('kelas_id', $r->kelas_id)
-                    ->where('mapel_id', $r->mapel_id)
-                    ->first();
+    return view('admin.guru.index', compact('guru', 'kelas', 'mapel'));
+}
+
+
+public function guruStore(Request $r)
+{
+    $r->validate([
+        'nama' => 'required|string|max:255',
+        'nip' => 'required|string|max:50|unique:guru,nip',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:6',
+        'mapel_id' => 'required|exists:mapel,id',
+        'kelas_id' => 'required|array|min:1|max:10',
+        'kelas_id.*' => 'exists:kelas,id'
+    ], [
+        'kelas_id.required' => 'Pilih minimal 1 kelas.',
+        'kelas_id.max' => 'Maksimal 10 kelas boleh dipilih.',
+    ]);
+
+    // 🔒 Cek apakah kelas + mapel sudah diajar guru lain
+    foreach ($r->kelas_id as $kelasId) {
+        $cek = Jadwal::where('kelas_id', $kelasId)
+                     ->where('mapel_id', $r->mapel_id)
+                     ->exists();
 
         if ($cek) {
             return back()
-                ->withErrors(['kelas_id' => '❌ Kelas dan mapel ini sudah diajar guru lain.'])
+                ->withErrors(['kelas_id' => '❌ Kelas '.Kelas::find($kelasId)->nama_kelas.' untuk mapel ini sudah diajar guru lain.'])
                 ->withInput();
         }
+    }
 
-        $user = User::create([
-            'name' => $r->nama,
-            'email' => $r->email,
-            'password' => Hash::make($r->password),
-            'role' => 'guru'
-        ]);
+    // 🧍 Buat user & guru
+    $user = User::create([
+        'name' => $r->nama,
+        'email' => $r->email,
+        'password' => Hash::make($r->password),
+        'role' => 'guru'
+    ]);
 
-        $guru = Guru::create([
-            'user_id' => $user->id,
-            'nama' => $r->nama,
-            'nip' => $r->nip,
-            'email' => $r->email,
-        ]);
+    $guru = Guru::create([
+        'user_id' => $user->id,
+        'nama' => $r->nama,
+        'nip' => $r->nip,
+        'email' => $r->email,
+    ]);
 
+    // 📚 Simpan jadwal
+    foreach ($r->kelas_id as $kelasId) {
         Jadwal::create([
             'guru_id'  => $guru->id,
-            'kelas_id' => $r->kelas_id,
+            'kelas_id' => $kelasId,
             'mapel_id' => $r->mapel_id,
         ]);
-
-        return back()->with('success', '✅ Guru berhasil ditambahkan');
     }
 
-    public function guruEdit($id)
-    {
-        $guru  = Guru::with(['user','jadwal.mapel','jadwal.kelas'])->findOrFail($id);
-        $mapel = Mapel::all();
-        $kelas = Kelas::all();
-
-        return view('admin.guru.edit', compact('guru', 'mapel', 'kelas'));
-    }
+    return back()->with('success', '✅ Guru berhasil ditambahkan');
+}
 
 
-    public function guruUpdate(Request $r, $id)
-    {
-        $guru = Guru::findOrFail($id);
+public function guruEdit($id)
+{
+    $guru  = Guru::with(['user','jadwal.mapel','jadwal.kelas'])->findOrFail($id);
+    $mapel = Mapel::all();
+    $kelas = Kelas::all();
 
-        $r->validate([
-            'nama' => 'required|string|max:255',
-            'nip' => 'required|string|max:50|unique:guru,nip,' . $id,
-            'email' => 'required|email|unique:guru,email,' . $id,
-            'mapel_id' => 'required|exists:mapel,id',
-            'kelas_id' => 'required|exists:kelas,id'
-        ]);
+    return view('admin.guru.edit', compact('guru', 'mapel', 'kelas'));
+}
 
-        // 🔒 Cek apakah kombinasi kelas + mapel sudah dipakai guru lain
-        $cek = Jadwal::where('kelas_id', $r->kelas_id)
+
+public function guruUpdate(Request $r, $id)
+{
+    $guru = Guru::findOrFail($id);
+
+    $r->validate([
+        'nama' => 'required|string|max:255',
+        'nip' => 'required|string|max:50|unique:guru,nip,' . $id,
+        'email' => 'required|email|unique:guru,email,' . $id,
+        'mapel_id' => 'required|exists:mapel,id',
+        'kelas_id' => 'required|array|min:1|max:10',
+        'kelas_id.*' => 'exists:kelas,id'
+    ]);
+
+    // 🔒 Pastikan kelas-mapel belum dipakai guru lain
+    foreach ($r->kelas_id as $kelasId) {
+        $cek = Jadwal::where('kelas_id', $kelasId)
                     ->where('mapel_id', $r->mapel_id)
-                    ->where('guru_id', '!=', $guru->id) // jangan cek diri sendiri
-                    ->first();
+                    ->where('guru_id', '!=', $guru->id)
+                    ->exists();
 
         if ($cek) {
             return back()
-                ->withErrors(['kelas_id' => '❌ Kelas dan mapel ini sudah diajar guru lain.'])
+                ->withErrors(['kelas_id' => '❌ Kelas '.Kelas::find($kelasId)->nama_kelas.' untuk mapel ini sudah diajar guru lain.'])
                 ->withInput();
         }
+    }
 
-        $guru->update([
-            'nama' => $r->nama,
-            'nip' => $r->nip,
-            'email' => $r->email,
-        ]);
+    // 🧩 Update data guru
+    $guru->update([
+        'nama' => $r->nama,
+        'nip' => $r->nip,
+        'email' => $r->email,
+    ]);
 
-        // Hapus jadwal lama lalu buat baru
-        Jadwal::where('guru_id', $guru->id)->delete();
+    // 🔁 Update user
+    $guru->user->update([
+        'name' => $r->nama,
+        'email' => $r->email,
+    ]);
+
+    // 🔁 Hapus & buat ulang jadwal
+    Jadwal::where('guru_id', $guru->id)->delete();
+    foreach ($r->kelas_id as $kelasId) {
         Jadwal::create([
-            'guru_id' => $guru->id,
-            'kelas_id' => $r->kelas_id,
+            'guru_id'  => $guru->id,
+            'kelas_id' => $kelasId,
             'mapel_id' => $r->mapel_id,
         ]);
-
-        return redirect()->route('admin.guru.index')->with('success', '✅ Guru berhasil diperbarui');
     }
 
-    public function guruDelete($id)
-    {
-        $guru = Guru::findOrFail($id);
+    return redirect()->route('admin.guru.index')->with('success', '✅ Guru berhasil diperbarui');
+}
+
+
+public function guruDelete($id)
+{
+    $guru = Guru::findOrFail($id);
+    if ($guru->user) {
         $guru->user->delete();
-        $guru->delete();
-        return back()->with('success', 'Guru dihapus');
     }
+    Jadwal::where('guru_id', $guru->id)->delete();
+    $guru->delete();
+
+    return back()->with('success', '🗑️ Guru berhasil dihapus');
+}
 
     // ======================= SISWA =======================
 public function siswaIndex(Request $r)
